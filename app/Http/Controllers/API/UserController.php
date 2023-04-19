@@ -157,7 +157,8 @@ class UserController extends Controller
     {
         $data = $request->all();
 
-        $user = Auth::user();
+        // $user = Auth::user();
+        $user = auth()->user()->id;
         if (!$user) {
             return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 500);
         }
