@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
@@ -27,7 +29,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name', 'email', 'password',
-        'address', 'phone_number', 'roles'
+        'address', 'phone_number', 'roles', 'profilePhotoPath'
     ];
 
     /**
@@ -60,7 +62,32 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    public function toArray()
+    {
+        $toArray = parent::toArray();
+        $toArray['profilePhotoPath'] = $this->profilePhotoPath;
+        return $toArray;
+    }
 
+    public function getProfilePhotoPathAttribute()
+    {
+        return $this->attributes['profilePhotoPath'];
+        // return url('');
+        // return url('') . Storage::url($this->attributes['profilePhotoPath']);
+    }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->timestamp;
+    }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->timestamp;
+    }
+
+
+    // Relation
     public function mechanicTransaction()
     {
         return $this->hasOne(MechanicTransaction::class);

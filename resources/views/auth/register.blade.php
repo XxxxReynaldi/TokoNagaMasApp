@@ -55,10 +55,10 @@
                           </span>
                       @enderror
                     </div>
-                    <div class="input-group input-group-outline mb-3 @error('phoneNumber') is-invalid is-filled @enderror">
+                    <div class="input-group input-group-outline mb-3 @error('phone_number') is-invalid is-filled @enderror">
                       <label class="form-label">Phone Number</label>
-                      <input type="text" class="form-control @error('phoneNumber') is-invalid @enderror" name="phoneNumber"> 
-                      @error('phoneNumber')
+                      <input type="text" class="form-control @error('phone_number') is-invalid @enderror" name="phone_number"> 
+                      @error('phone_number')
                           <span class="invalid-feedback" role="alert">
                               <strong>{{ $message }}</strong>
                           </span>
