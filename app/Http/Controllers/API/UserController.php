@@ -155,15 +155,31 @@ class UserController extends Controller
 
     public function updateProfile(Request $request, $id)
     {
-        $data = $request->all();
+        try {
+            $data = $request->all();
+            $rules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            ];
 
-        // $user = Auth::user();
-        $user = auth()->user()->id;
-        if (!$user) {
-            return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 500);
+            $validatedData = $request->validate($rules);
+
+            // $user = Auth::user();
+            $user = User::find($id);
+            if (!$user) {
+                return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 500);
+            }
+            $user->update($data);
+
+            return ResponseFormatter::success([
+                'user' => $user
+            ], 'User data updated successfully');
+        } catch (Exception $e) {
+            $errors = $e->errors();
+            return ResponseFormatter::error([
+                'message' => 'Validation error',
+                'errors' => $errors,
+            ], 'Validation Failed', 422);
         }
-        $user->update($data);
-
-        return ResponseFormatter::success($user, 'Profile Updated');
     }
 }

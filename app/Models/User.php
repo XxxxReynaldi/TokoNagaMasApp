@@ -72,7 +72,6 @@ class User extends Authenticatable
     public function getProfilePhotoPathAttribute()
     {
         return $this->attributes['profilePhotoPath'];
-        // return url('');
         // return url('') . Storage::url($this->attributes['profilePhotoPath']);
     }
 
