@@ -24,7 +24,8 @@ class Product extends Model
 
     public function getProductPhotoPathAttribute()
     {
-        return url('') . Storage::url($this->attributes['productPhotoPath']);
+        return $this->attributes['productPhotoPath'];
+        // return url('') . Storage::url($this->attributes['productPhotoPath']);
     }
 
     public function getCreatedAtAttribute($value)
