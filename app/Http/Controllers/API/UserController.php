@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
 {
@@ -29,10 +31,18 @@ class UserController extends Controller
 
             // credentials check
             $credentials = request(['email', 'password']);
-            if (!Auth::attempt($credentials)) {
+            try {
+                if (!$tokenResult = JWTAuth::attempt($credentials)) {
+                    return ResponseFormatter::error([
+                        'message' => 'Invalid credentials'
+                    ], 'Authentication Failed', 401);
+                }
+            } catch (JWTException $e) {
+                return $credentials;
                 return ResponseFormatter::error([
-                    'message' => 'Unauthorized'
-                ], 'Authentication Failed', 500);
+                    'success' => false,
+                    'message' => 'Could not create token.',
+                ], 500);
             }
 
             $user = User::where('email', $request->email)->first();
@@ -40,7 +50,7 @@ class UserController extends Controller
                 throw new \Exception('Invalid Credentials');
             }
 
-            $tokenResult = $user->createToken('authToken')->plainTextToken;
+            // $tokenResult = $user->createToken('authToken')->plainTextToken;
 
             return ResponseFormatter::success([
                 'access_token' => $tokenResult,
@@ -75,24 +85,76 @@ class UserController extends Controller
             'address' => $request->address,
             'password' => Hash::make($request->password),
             // 'password' => bcrypt($request->password),
-            'roles' => 'customer'
+            'role_id' => $request->role_id,
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        $token = $user->createToken('authToken')->plainTextToken;
+        // $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
+            // 'access_token' => $token,
+            // 'token_type' => 'Bearer',
+            'message' => 'User created successfully',
             'user' => $user
         ], 200);
     }
 
+
+
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => $this->guard()->factory()->getTTL() * 60
+        ]);
+    }
+
+    /**
+     * Get the authenticated User
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        return response()->json($this->guard()->user());
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken($this->guard()->refresh());
+    }
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\Guard
+     */
+    public function guard()
+    {
+        return Auth::guard();
+    }
+
+
     public function logout(Request $request)
     {
-        $token = $request->user()->currentAccessToken()->delete();
-        return ResponseFormatter::success($token, 'Token Revoked');
+        // $token = $request->user()->currentAccessToken()->delete();
+        // return ResponseFormatter::success($token, 'Token Revoked');
+        $this->guard()->logout();
+        return ResponseFormatter::success('token', 'Token Revoked');
     }
 
     public function showProfile(Request $request)
@@ -107,20 +169,12 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(
-                ['error' => $validator->errors()],
-                'Update photo fails',
-                401
-            );
+            return ResponseFormatter::error(['error' => $validator->errors()], 'Update photo fails', 401);
         }
 
         $user = User::find($id);
         if (!$user) {
-            return ResponseFormatter::error(
-                ['error' => 'User Not Found'],
-                'User Not Found',
-                404
-            );
+            return ResponseFormatter::error(['error' => 'User Not Found'], 'User Not Found', 404);
         }
 
         $folder = $user->id;
@@ -134,22 +188,21 @@ class UserController extends Controller
          * $path: pisahkan http://127.0.0.1:8000 menjadi /img/photoProfile/{folder}/{file}
          * 
          * $relativePath : buat link /var/www/myapp/public/img/photoProfile/{folder}/{file}
-         */
+         */;
+        if ($user->profilePhotoPath) {
+            $path = parse_url($user->profilePhotoPath, PHP_URL_PATH);
+            $relativePath = public_path($path);
 
-        $path = parse_url($user->profilePhotoPath, PHP_URL_PATH);
-        $relativePath = public_path($path);
-
-        if (file_exists($relativePath)) {
-            unlink($relativePath);
+            if (file_exists($relativePath)) {
+                unlink($relativePath);
+            }
         }
         $image->move($imagePath, $imageName);
 
         $user->profilePhotoPath = $imageUrl;
         $user->save();
 
-        return ResponseFormatter::success([
-            'profilePhotoPath' => $imageUrl
-        ], 'File success upload');
+        return ResponseFormatter::success(['profilePhotoPath' => $imageUrl], 'File success upload');
     }
 
 
@@ -171,9 +224,7 @@ class UserController extends Controller
             }
             $user->update($data);
 
-            return ResponseFormatter::success([
-                'user' => $user
-            ], 'User data updated successfully');
+            return ResponseFormatter::success(['user' => $user], 'User data updated successfully');
         } catch (Exception $e) {
             $errors = $e->errors();
             return ResponseFormatter::error([

@@ -24,7 +24,8 @@ class Mechanic extends Model
 
     public function getMechanicPhotoPathAttribute()
     {
-        return url('') . Storage::url($this->attributes['mechanicPhotoPath']);
+        return $this->attributes['mechanicPhotoPath'];
+        // return url('') . Storage::url($this->attributes['mechanicPhotoPath']);
     }
 
     public function getCreatedAtAttribute($value)
