@@ -24,7 +24,8 @@ class Gallery extends Model
 
     public function getGalleryPhotoPathAttribute()
     {
-        return url('') . Storage::url($this->attributes['galleryPhotoPath']);
+        return $this->attributes['galleryPhotoPath'];
+        // return url('') . Storage::url($this->attributes['galleryPhotoPath']);
     }
 
     public function getCreatedAtAttribute($value)
@@ -42,5 +43,10 @@ class Gallery extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'gallery_product');
+    }
+
+    public function mechanic()
+    {
+        return $this->belongsTo(Mechanic::class);
     }
 }

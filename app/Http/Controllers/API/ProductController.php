@@ -58,7 +58,7 @@ class ProductController extends Controller
         );
     }
 
-    public function index(Request $request)
+    public function index()
     {
 
         // Jika header authorization tidak kosong, ambil user yang login
@@ -109,7 +109,7 @@ class ProductController extends Controller
         $data['productPhotoPath'] = $imageUrl;
         $product = Product::create($data);
 
-        return ResponseFormatter::success(['product' => $product], 'Products inserted successfully');
+        return ResponseFormatter::success(['product' => $product], 'Product inserted successfully');
     }
 
 

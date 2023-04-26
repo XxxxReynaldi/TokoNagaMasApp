@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\GalleryController;
 use App\Http\Controllers\API\MechanicController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserController;
@@ -36,6 +37,10 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::get('product', [ProductController::class, 'index']);
         Route::get('product/filter', [ProductController::class, 'filter']);
         Route::get('product/{id}', [ProductController::class, 'show']);
+
+        Route::get('gallery', [GalleryController::class, 'index']);
+        Route::get('gallery/filter', [GalleryController::class, 'filter']);
+        Route::get('gallery/{id}', [GalleryController::class, 'show']);
     });
 });
 
@@ -53,6 +58,12 @@ Route::group(['middleware' => ['checkroleapi:admin']], function () {
         Route::patch('product/{id}', [ProductController::class, 'update']);
         Route::delete('product/{id}', [ProductController::class, 'destroy']);
         Route::delete('product/mass-delete', [ProductController::class, 'massDestroy']);
+
+        // Gallery
+        Route::post('gallery', [GalleryController::class, 'store']);
+        Route::patch('gallery/{id}', [GalleryController::class, 'update']);
+        Route::delete('gallery/{id}', [GalleryController::class, 'destroy']);
+        Route::delete('gallery/mass-delete', [GalleryController::class, 'massDestroy']);
     });
 });
 

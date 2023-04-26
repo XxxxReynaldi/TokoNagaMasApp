@@ -44,4 +44,9 @@ class Mechanic extends Model
     {
         return $this->hasOne(MechanicTransaction::class);
     }
+
+    public function mechanicGallery()
+    {
+        return $this->hasOne(Gallery::class);
+    }
 }

@@ -43,7 +43,7 @@ class MechanicController extends Controller
         );
     }
 
-    public function index(Request $request)
+    public function index()
     {
 
         // Jika header authorization tidak kosong, ambil user yang login
@@ -93,7 +93,7 @@ class MechanicController extends Controller
         $data['mechanicPhotoPath'] = $imageUrl;
         $mechanic = Mechanic::create($data);
 
-        return ResponseFormatter::success(['mechanic' => $mechanic], 'Mechanics inserted successfully');
+        return ResponseFormatter::success(['mechanic' => $mechanic], 'Mechanic inserted successfully');
     }
 
 
