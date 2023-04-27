@@ -12,7 +12,7 @@ class Gallery extends Model
     use HasFactory;
 
     protected $fillable = [
-        'mechanic_id', 'galleryPhotoPath', 'description', 'repair_type'
+        'mechanic_recommendation', 'galleryPhotoPath', 'description', 'repair_type'
     ];
 
     public function toArray()
