@@ -11,7 +11,7 @@ class CartProduct extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'product_id', 'quantity', 'price'
+        'user_id', 'product_id', 'quantity', 'price', 'status_check'
     ];
 
     public function getCreatedAtAttribute($value)

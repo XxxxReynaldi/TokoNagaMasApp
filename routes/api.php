@@ -1,5 +1,7 @@
 <?php
 
+
+use App\Http\Controllers\API\CartProductController;
 use App\Http\Controllers\API\GalleryController;
 use App\Http\Controllers\API\MechanicController;
 use App\Http\Controllers\API\ProductController;
@@ -41,6 +43,12 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::get('gallery', [GalleryController::class, 'index']);
         Route::get('gallery/filter', [GalleryController::class, 'filter']);
         Route::get('gallery/{id}', [GalleryController::class, 'show']);
+
+        Route::get('cart-product', [CartProductController::class, 'index']);
+        Route::get('cart-product/filter', [CartProductController::class, 'filter']);
+        Route::get('cart-product/{user_id}', [CartProductController::class, 'show']);
+        Route::post('cart-product', [CartProductController::class, 'store']);
+        Route::patch('cart-product/massUpdate/{user_id}', [CartProductController::class, 'massUpdate']);
     });
 });
 
@@ -74,6 +82,8 @@ Route::group(['middleware' => ['checkroleapi:customer']], function () {
         // Route::patch('mechanic/{id}', [MechanicController::class, 'update']);
         // Route::delete('mechanic/{id}', [MechanicController::class, 'destroy']);
         // Route::delete('mechanic/mass-delete', [MechanicController::class, 'massDestroy']);
+
+        // Route::post('cart-product', [GalleryController::class, 'store']);
     });
 });
 
