@@ -48,7 +48,8 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::get('cart-product/filter', [CartProductController::class, 'filter']);
         Route::get('cart-product/{user_id}', [CartProductController::class, 'show']);
         Route::post('cart-product', [CartProductController::class, 'store']);
-        Route::patch('cart-product/massUpdate/{user_id}', [CartProductController::class, 'massUpdate']);
+        Route::patch('cart-product/mass-update/{user_id}', [CartProductController::class, 'massUpdate']);
+        Route::patch('cart-product/mass-delete', [CartProductController::class, 'massDestroy']);
     });
 });
 

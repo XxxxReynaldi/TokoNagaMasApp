@@ -8,6 +8,7 @@ use App\Models\CartProduct;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CartProductController extends Controller
@@ -162,5 +163,20 @@ class CartProductController extends Controller
 
         $cartProduct->delete();
         return ResponseFormatter::success(['cartProduct' => $cartProduct], 'Cart Product deleted successfully');
+    }
+
+    public function massDestroy(Request $request)
+    {
+        // memeriksa apakah pengguna memiliki akses untuk melakukan aksi ini
+        $user = Auth::user();
+        if (!$user) {
+            return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 401);
+        }
+
+        $ids = $request->input('ids');
+        $cartProduct = CartProduct::whereIn('id', $ids)->get();
+
+        CartProduct::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Cart Product deleted successfully.']);
     }
 }

@@ -6,6 +6,7 @@ use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -195,5 +196,27 @@ class GalleryController extends Controller
 
         $gallery->delete();
         return ResponseFormatter::success(['gallery' => $gallery], 'Gallery deleted successfully');
+    }
+
+    public function massDestroy(Request $request)
+    {
+        // memeriksa apakah pengguna memiliki akses untuk melakukan aksi ini
+        $user = Auth::user();
+        if (!$user) {
+            return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 401);
+        }
+
+        $ids = $request->input('ids');
+        $galleries = Gallery::whereIn('id', $ids)->get();
+        foreach ($galleries as $gallery) {
+            if ($gallery->galleryPhotoPath) {
+                $imagePath = public_path('img/photoGallery') . '/' . basename($gallery->galleryPhotoPath);
+                if (File::exists($imagePath)) {
+                    File::delete($imagePath);
+                }
+            }
+        }
+        Gallery::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Gallery deleted successfully.']);
     }
 }
