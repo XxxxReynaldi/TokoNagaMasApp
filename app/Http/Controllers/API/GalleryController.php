@@ -182,7 +182,11 @@ class GalleryController extends Controller
 
     public function destroy($id)
     {
-        $gallery = Gallery::find($id);
+        $gallery = Gallery::with([
+            'products' => function ($query) {
+                $query->select('name', 'price', 'stock', 'description', 'productPhotoPath');
+            }
+        ])->find($id);
         if (!$gallery) {
             return ResponseFormatter::error(['error' => 'Gallery Not Found'], 'Gallery Not Found', 404);
         }

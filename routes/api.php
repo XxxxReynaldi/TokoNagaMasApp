@@ -48,8 +48,9 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::get('cart-product/filter', [CartProductController::class, 'filter']);
         Route::get('cart-product/{user_id}', [CartProductController::class, 'show']);
         Route::post('cart-product', [CartProductController::class, 'store']);
+        Route::delete('cart-product/{id}', [CartProductController::class, 'destroy']);
         Route::patch('cart-product/mass-update/{user_id}', [CartProductController::class, 'massUpdate']);
-        Route::patch('cart-product/mass-delete', [CartProductController::class, 'massDestroy']);
+        Route::post('cart-product/mass-delete/{user_id}', [CartProductController::class, 'massDestroy']);
     });
 });
 
@@ -60,19 +61,19 @@ Route::group(['middleware' => ['checkroleapi:admin']], function () {
         Route::post('mechanic', [MechanicController::class, 'store']);
         Route::patch('mechanic/{id}', [MechanicController::class, 'update']);
         Route::delete('mechanic/{id}', [MechanicController::class, 'destroy']);
-        Route::delete('mechanic/mass-delete', [MechanicController::class, 'massDestroy']);
+        Route::post('mechanic/mass-delete', [MechanicController::class, 'massDestroy']);
 
         // Product
         Route::post('product', [ProductController::class, 'store']);
         Route::patch('product/{id}', [ProductController::class, 'update']);
         Route::delete('product/{id}', [ProductController::class, 'destroy']);
-        Route::delete('product/mass-delete', [ProductController::class, 'massDestroy']);
+        Route::post('product/mass-delete', [ProductController::class, 'massDestroy']);
 
         // Gallery
         Route::post('gallery', [GalleryController::class, 'store']);
         Route::patch('gallery/{id}', [GalleryController::class, 'update']);
         Route::delete('gallery/{id}', [GalleryController::class, 'destroy']);
-        Route::delete('gallery/mass-delete', [GalleryController::class, 'massDestroy']);
+        Route::post('gallery/mass-delete', [GalleryController::class, 'massDestroy']);
     });
 });
 

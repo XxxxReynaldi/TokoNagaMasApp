@@ -40,7 +40,14 @@ class CartProductController extends Controller
         // $status_check = $request->input('status_check');
 
         if ($id) {
-            $cartProduct = CartProduct::find($id);
+            $cartProduct = CartProduct::with([
+                'product' => function ($query) {
+                    $query->select('id', 'name', 'price', 'stock', 'productPhotoPath');
+                },
+                'user' => function ($query) {
+                    $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+                }
+            ])->find($id);
 
             if ($cartProduct)
                 return ResponseFormatter::success($cartProduct, 'Data cart product retrieved successfully');
@@ -156,7 +163,14 @@ class CartProductController extends Controller
 
     public function destroy($id)
     {
-        $cartProduct = CartProduct::find($id);
+        $cartProduct = CartProduct::with([
+            'product' => function ($query) {
+                $query->select('id', 'name', 'price', 'stock', 'productPhotoPath');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+            }
+        ])->find($id);
         if (!$cartProduct) {
             return ResponseFormatter::error(['error' => 'Cart Product Not Found'], 'Cart Product Not Found', 404);
         }
@@ -165,18 +179,30 @@ class CartProductController extends Controller
         return ResponseFormatter::success(['cartProduct' => $cartProduct], 'Cart Product deleted successfully');
     }
 
-    public function massDestroy(Request $request)
+    public function massDestroy(Request $request, $user_id)
     {
-        // memeriksa apakah pengguna memiliki akses untuk melakukan aksi ini
-        $user = Auth::user();
+
+        $user = User::find($user_id);
         if (!$user) {
-            return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 401);
+            return ResponseFormatter::error(['error' => 'User Not Found'], 'Mass delete cart products failed, User Not Found', 400);
         }
 
         $ids = $request->input('ids');
-        $cartProduct = CartProduct::whereIn('id', $ids)->get();
+        $cartProduct = CartProduct::with([
+            'product' => function ($query) {
+                $query->select('id', 'name', 'price', 'stock', 'productPhotoPath');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+            }
+        ])->whereIn('id', $ids)->where('user_id', $user_id)->get();
+
+        if ($cartProduct->isEmpty()) {
+            return ResponseFormatter::error(['error' => 'Cart Product Not Found'], 'Mass delete cart products failed', 400);
+        }
 
         CartProduct::whereIn('id', $ids)->delete();
-        return response()->json(['message' => 'Cart Product deleted successfully.']);
+        // return response()->json(['message' => 'Cart Product deleted successfully.']);
+        return ResponseFormatter::success(['cartProduct' => $cartProduct], 'Cart Product deleted successfully');
     }
 }
