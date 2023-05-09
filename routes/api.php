@@ -5,6 +5,7 @@ use App\Http\Controllers\API\CartProductController;
 use App\Http\Controllers\API\GalleryController;
 use App\Http\Controllers\API\MechanicController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\ProductTransactionController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,9 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::delete('cart-product/{id}', [CartProductController::class, 'destroy']);
         Route::patch('cart-product/mass-update/{user_id}', [CartProductController::class, 'massUpdate']);
         Route::post('cart-product/mass-delete/{user_id}', [CartProductController::class, 'massDestroy']);
+
+        // for dev
+        Route::delete('transaction/{id}', [ProductTransactionController::class, 'destroy']);
     });
 });
 
@@ -80,12 +84,9 @@ Route::group(['middleware' => ['checkroleapi:admin']], function () {
 // Customer
 Route::group(['middleware' => ['checkroleapi:customer']], function () {
     Route::group(['prefix' => 'v1', 'as' => 'v1.',], function () {
-        // Route::post('mechanic', [MechanicController::class, 'store']);
-        // Route::patch('mechanic/{id}', [MechanicController::class, 'update']);
-        // Route::delete('mechanic/{id}', [MechanicController::class, 'destroy']);
-        // Route::delete('mechanic/mass-delete', [MechanicController::class, 'massDestroy']);
 
-        // Route::post('cart-product', [GalleryController::class, 'store']);
+
+        Route::post('checkout', [ProductTransactionController::class, 'checkout']);
     });
 });
 

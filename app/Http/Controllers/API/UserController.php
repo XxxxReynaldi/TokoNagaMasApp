@@ -89,12 +89,26 @@ class UserController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+        $credentials = request(['email', 'password']);
+        try {
+            if (!$tokenResult = JWTAuth::attempt($credentials)) {
+                return ResponseFormatter::error([
+                    'message' => 'Invalid credentials'
+                ], 'Authentication Failed', 401);
+            }
+        } catch (JWTException $e) {
+            return $credentials;
+            return ResponseFormatter::error([
+                'success' => false,
+                'message' => 'Could not create token.',
+            ], 500);
+        }
 
         // $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
-            // 'access_token' => $token,
-            // 'token_type' => 'Bearer',
+            'access_token' => $tokenResult,
+            'token_type' => 'Bearer',
             'message' => 'User created successfully',
             'user' => $user
         ], 200);
@@ -180,24 +194,20 @@ class UserController extends Controller
         $folder = $user->id;
         $image = $request->file('profilePhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $imagePath = public_path('img/photoProfile/' . $folder);
 
-        $imageUrl = url('img/photoProfile/' . $folder . '/' . $imageName);
+        $profilePhotoPath = $request->file('profilePhotoPath')->storeAs('public/img/photoProfile/' . $folder, $imageName);
+        $imageUrl = url('') . Storage::url($profilePhotoPath);
 
-        /**
-         * $path: pisahkan http://127.0.0.1:8000 menjadi /img/photoProfile/{folder}/{file}
-         * 
-         * $relativePath : buat link /var/www/myapp/public/img/photoProfile/{folder}/{file}
-         */;
+
         if ($user->profilePhotoPath) {
             $path = parse_url($user->profilePhotoPath, PHP_URL_PATH);
-            $relativePath = public_path($path);
+            $fileName = basename($path);
+            $relativePath = 'public/img/photoProfile/' . $folder . '/' . $fileName;
 
-            if (file_exists($relativePath)) {
-                unlink($relativePath);
+            if (Storage::exists($relativePath)) {
+                Storage::delete($relativePath);
             }
         }
-        $image->move($imagePath, $imageName);
 
         $user->profilePhotoPath = $imageUrl;
         $user->save();

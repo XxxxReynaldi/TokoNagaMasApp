@@ -12,8 +12,8 @@ class ProductTransaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'purchaseReceiptPath', 'bank_account_name',
-        'bank_name', 'account_number', 'total_price'
+        'user_id', 'status', 'purchaseReceiptPath', 'bank_account_name',
+        'bank_name', 'account_number', 'total_price',
     ];
 
     public function toArray()
@@ -25,7 +25,8 @@ class ProductTransaction extends Model
 
     public function getPurchaseReceiptPathAttribute()
     {
-        return url('') . Storage::url($this->attributes['purchaseReceiptPath']);
+        return $this->attributes['purchaseReceiptPath'];
+        // return url('') . Storage::url($this->attributes['purchaseReceiptPath']);
     }
 
     public function getCreatedAtAttribute($value)
@@ -41,6 +42,6 @@ class ProductTransaction extends Model
     // Relation
     public function products()
     {
-        return $this->belongsToMany(Product::class)->withPivot('quantity', 'price');
+        return $this->belongsToMany(Product::class, 'transaction_details')->withPivot('quantity', 'price');
     }
 }
