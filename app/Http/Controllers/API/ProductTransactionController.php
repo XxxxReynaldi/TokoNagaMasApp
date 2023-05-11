@@ -104,7 +104,7 @@ class ProductTransactionController extends Controller
         $image = $request->file('purchaseReceiptPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
 
-        $purchaseReceiptPath = $request->file('purchaseReceiptPath')->storeAs('public/img/purchaseReceipt/' . $folder, $imageName);
+        $purchaseReceiptPath = $request->file('purchaseReceiptPath')->storeAs('public/img/purchaseReceipt/' . $folder . '/product', $imageName);
         $data['status'] = 'pending';
         $data['purchaseReceiptPath'] = url('') . Storage::url($purchaseReceiptPath);
 
@@ -150,7 +150,6 @@ class ProductTransactionController extends Controller
         //     ->join('transaction_details', 'products.id', '=', 'transaction_details.product_id')
         //     ->whereIn('transaction_details.product_transaction_id', [$id]);
 
-        $transaction = ProductTransaction::find($id);
         // $detailTransaction = $query2->get();
 
         if (!$transaction) {
@@ -162,7 +161,7 @@ class ProductTransactionController extends Controller
         if ($imagePath) {
             $path = parse_url($transaction->purchaseReceiptPath, PHP_URL_PATH);
             $fileName = basename($path);
-            $relativePath = 'public/img/purchaseReceipt/' . $folder . '/' . $fileName;
+            $relativePath = 'public/img/purchaseReceipt/' . $folder . '/product/' . $fileName;
 
             if (Storage::exists($relativePath)) {
                 Storage::delete($relativePath);

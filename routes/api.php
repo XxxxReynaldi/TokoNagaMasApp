@@ -4,6 +4,7 @@
 use App\Http\Controllers\API\CartProductController;
 use App\Http\Controllers\API\GalleryController;
 use App\Http\Controllers\API\MechanicController;
+use App\Http\Controllers\API\MechanicTransactionController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ProductTransactionController;
 use App\Http\Controllers\API\UserController;
@@ -54,7 +55,8 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::post('cart-product/mass-delete/{user_id}', [CartProductController::class, 'massDestroy']);
 
         // for dev
-        Route::delete('transaction/{id}', [ProductTransactionController::class, 'destroy']);
+        Route::delete('product-transaction-co/{id}', [ProductTransactionController::class, 'destroy']);
+        Route::delete('mechanic-transaction-co/{id}', [MechanicTransactionController::class, 'destroy']);
     });
 });
 
@@ -86,7 +88,8 @@ Route::group(['middleware' => ['checkroleapi:customer']], function () {
     Route::group(['prefix' => 'v1', 'as' => 'v1.',], function () {
 
 
-        Route::post('checkout', [ProductTransactionController::class, 'checkout']);
+        Route::post('product-transaction-co', [ProductTransactionController::class, 'checkout']);
+        Route::post('mechanic-transaction-co', [MechanicTransactionController::class, 'checkout']);
     });
 });
 

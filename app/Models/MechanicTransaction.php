@@ -12,7 +12,7 @@ class MechanicTransaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'mechanic_id', 'purchaseReceiptPath',
+        'user_id', 'mechanic_id', 'status', 'purchaseReceiptPath',
         'bank_account_name', 'bank_name', 'account_number',
         'total_price',
     ];
@@ -26,7 +26,8 @@ class MechanicTransaction extends Model
 
     public function getPurchaseReceiptPathAttribute()
     {
-        return url('') . Storage::url($this->attributes['purchaseReceiptPath']);
+        return $this->attributes['purchaseReceiptPath'];
+        // return url('') . Storage::url($this->attributes['purchaseReceiptPath']);
     }
 
     public function getCreatedAtAttribute($value)
