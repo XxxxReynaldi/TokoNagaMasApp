@@ -101,7 +101,7 @@ class ProductController extends Controller
 
         $image = $request->file('productPhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $productPhotoPath = $request->file('productPhotoPath')->storeAs('public/img/photoProduct/', $imageName);
+        $productPhotoPath = $request->file('productPhotoPath')->storeAs('public/img/photoProduct', $imageName);
         $imageUrl = url('') . Storage::url($productPhotoPath);
 
 
@@ -135,7 +135,7 @@ class ProductController extends Controller
             $image = $request->file('productPhotoPath');
             $imageName = time() . '_' . $image->getClientOriginalName();
 
-            $productPhotoPath = $request->file('productPhotoPath')->storeAs('public/img/photoProduct/', $imageName);
+            $productPhotoPath = $request->file('productPhotoPath')->storeAs('public/img/photoProduct', $imageName);
             $imageUrl = url('') . Storage::url($productPhotoPath);
 
 

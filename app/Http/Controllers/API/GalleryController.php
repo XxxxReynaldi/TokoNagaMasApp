@@ -114,7 +114,7 @@ class GalleryController extends Controller
 
         $image = $request->file('galleryPhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $galleryPhotoPath = $request->file('galleryPhotoPath')->storeAs('public/img/photoGallery/', $imageName);
+        $galleryPhotoPath = $request->file('galleryPhotoPath')->storeAs('public/img/photoGallery', $imageName);
         $imageUrl = url('') . Storage::url($galleryPhotoPath);
 
         $data['galleryPhotoPath'] = $imageUrl;
@@ -151,7 +151,7 @@ class GalleryController extends Controller
             $image = $request->file('galleryPhotoPath');
             $imageName = time() . '_' . $image->getClientOriginalName();
 
-            $galleryPhotoPath = $request->file('galleryPhotoPath')->storeAs('public/img/photoGallery/', $imageName);
+            $galleryPhotoPath = $request->file('galleryPhotoPath')->storeAs('public/img/photoGallery', $imageName);
             $imageUrl = url('') . Storage::url($galleryPhotoPath);
 
             /**
@@ -177,8 +177,13 @@ class GalleryController extends Controller
             $gallery->products()->sync($request->input('product'));
         }
         $gallery->update($data);
+        $newGallery = Gallery::with([
+            'products' => function ($query) {
+                $query->select('name', 'price', 'stock', 'description', 'productPhotoPath');
+            }
+        ])->find($id);
 
-        return ResponseFormatter::success(['gallery' => $gallery], 'Gallery updated successfully');
+        return ResponseFormatter::success(['gallery' => $newGallery], 'Gallery updated successfully');
     }
 
     public function destroy($id)

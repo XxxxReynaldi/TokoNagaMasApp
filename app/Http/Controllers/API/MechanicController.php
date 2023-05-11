@@ -75,6 +75,7 @@ class MechanicController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
             'status' => 'required',
             'mechanicPhotoPath' => 'required|image|max:4096',
@@ -86,7 +87,7 @@ class MechanicController extends Controller
 
         $image = $request->file('mechanicPhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $mechanicPhotoPath = $request->file('mechanicPhotoPath')->storeAs('public/img/photoMechanic/', $imageName);
+        $mechanicPhotoPath = $request->file('mechanicPhotoPath')->storeAs('public/img/photoMechanic', $imageName);
         $imageUrl = url('') . Storage::url($mechanicPhotoPath);
 
         $data['mechanicPhotoPath'] = $imageUrl;
@@ -101,6 +102,7 @@ class MechanicController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
             'status' => 'required',
             'mechanicPhotoPath' => 'nullable|image|max:4096',
@@ -119,7 +121,7 @@ class MechanicController extends Controller
             $image = $request->file('mechanicPhotoPath');
             $imageName = time() . '_' . $image->getClientOriginalName();
 
-            $mechanicPhotoPath = $request->file('mechanicPhotoPath')->storeAs('public/img/photoMechanic/', $imageName);
+            $mechanicPhotoPath = $request->file('mechanicPhotoPath')->storeAs('public/img/photoMechanic', $imageName);
             $imageUrl = url('') . Storage::url($mechanicPhotoPath);
 
             /**
