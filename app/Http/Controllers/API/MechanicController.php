@@ -75,6 +75,7 @@ class MechanicController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
+            'price' => 'required|integer|min:0',
             'status' => 'required',
             'mechanicPhotoPath' => 'required|image|max:4096',
         ]);
@@ -100,6 +101,7 @@ class MechanicController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
+            'price' => 'required|integer|min:0',
             'status' => 'required',
             'mechanicPhotoPath' => 'nullable|image|max:4096',
         ]);

@@ -12,7 +12,7 @@ class Mechanic extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'category', 'description', 'status', 'mechanicPhotoPath'
+        'name', 'category', 'price', 'description', 'status', 'mechanicPhotoPath'
     ];
 
     public function toArray()
