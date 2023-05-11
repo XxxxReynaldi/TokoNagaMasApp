@@ -8,6 +8,7 @@ use App\Models\Mechanic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MechanicController extends Controller
@@ -84,11 +85,8 @@ class MechanicController extends Controller
 
         $image = $request->file('mechanicPhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $imagePath = public_path('img/photoMechanic');
-        $imageUrl = url('img/photoMechanic/' . $imageName);
-
-        $image->move($imagePath, $imageName);
-
+        $mechanicPhotoPath = $request->file('mechanicPhotoPath')->storeAs('public/img/photoMechanic/', $imageName);
+        $imageUrl = url('') . Storage::url($mechanicPhotoPath);
 
         $data['mechanicPhotoPath'] = $imageUrl;
         $mechanic = Mechanic::create($data);
@@ -118,8 +116,9 @@ class MechanicController extends Controller
         if ($request->hasFile('mechanicPhotoPath')) {
             $image = $request->file('mechanicPhotoPath');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('img/photoMechanic');
-            $imageUrl = url('img/photoMechanic/' . $imageName);
+
+            $mechanicPhotoPath = $request->file('mechanicPhotoPath')->storeAs('public/img/photoMechanic/', $imageName);
+            $imageUrl = url('') . Storage::url($mechanicPhotoPath);
 
             /**
              * $path: pisahkan http://127.0.0.1:8000 menjadi /img/photoMechanic/{file}
@@ -127,13 +126,15 @@ class MechanicController extends Controller
              * $relativePath : buat link /var/www/myapp/public/img/photoMechanic/{file}
              */
 
-            $path = parse_url($mechanic->mechanicPhotoPath, PHP_URL_PATH);
-            $relativePath = public_path($path);
+            if ($mechanic->mechanicPhotoPath) {
+                $path = parse_url($mechanic->mechanicPhotoPath, PHP_URL_PATH);
+                $fileName = basename($path);
+                $relativePath = 'public/img/photoMechanic/' . $fileName;
 
-            if (file_exists($relativePath)) {
-                unlink($relativePath);
+                if (Storage::exists($relativePath)) {
+                    Storage::delete($relativePath);
+                }
             }
-            $image->move($imagePath, $imageName);
 
             $data['mechanicPhotoPath'] = $imageUrl;
         }
@@ -151,9 +152,12 @@ class MechanicController extends Controller
         }
 
         if ($mechanic->mechanicPhotoPath) {
-            $imagePath = public_path('img/photoMechanic') . '/' . basename($mechanic->mechanicPhotoPath);
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
+            $path = parse_url($mechanic->mechanicPhotoPath, PHP_URL_PATH);
+            $fileName = basename($path);
+            $relativePath = 'public/img/photoMechanic/' . $fileName;
+
+            if (Storage::exists($relativePath)) {
+                Storage::delete($relativePath);
             }
         }
 
@@ -173,9 +177,10 @@ class MechanicController extends Controller
         $mechanics = Mechanic::whereIn('id', $ids)->get();
         foreach ($mechanics as $mechanic) {
             if ($mechanic->mechanicPhotoPath) {
-                $imagePath = public_path('img/photoMechanic') . '/' . basename($mechanic->mechanicPhotoPath);
-                if (File::exists($imagePath)) {
-                    File::delete($imagePath);
+                $imagePath = 'public/img/photoMechanic/' . basename($mechanic->mechanicPhotoPath);
+
+                if (Storage::exists($imagePath)) {
+                    Storage::delete($imagePath);
                 }
             }
         }

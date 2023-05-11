@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -100,10 +101,8 @@ class ProductController extends Controller
 
         $image = $request->file('productPhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $imagePath = public_path('img/photoProduct');
-        $imageUrl = url('img/photoProduct/' . $imageName);
-
-        $image->move($imagePath, $imageName);
+        $productPhotoPath = $request->file('productPhotoPath')->storeAs('public/img/photoProduct/', $imageName);
+        $imageUrl = url('') . Storage::url($productPhotoPath);
 
 
         $data['productPhotoPath'] = $imageUrl;
@@ -135,8 +134,10 @@ class ProductController extends Controller
         if ($request->hasFile('productPhotoPath')) {
             $image = $request->file('productPhotoPath');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('img/photoProduct');
-            $imageUrl = url('img/photoProduct/' . $imageName);
+
+            $productPhotoPath = $request->file('productPhotoPath')->storeAs('public/img/photoProduct/', $imageName);
+            $imageUrl = url('') . Storage::url($productPhotoPath);
+
 
             /**
              * $path: pisahkan http://127.0.0.1:8000 menjadi /img/photoProduct/{file}
@@ -144,14 +145,15 @@ class ProductController extends Controller
              * $relativePath : buat link /var/www/myapp/public/img/photoProduct/{file}
              */
 
-            $path = parse_url($product->productPhotoPath, PHP_URL_PATH);
-            $relativePath = public_path($path);
+            if ($product->productPhotoPath) {
+                $path = parse_url($product->productPhotoPath, PHP_URL_PATH);
+                $fileName = basename($path);
+                $relativePath = 'public/img/photoProduct/' . $fileName;
 
-            if (file_exists($relativePath)) {
-                unlink($relativePath);
+                if (Storage::exists($relativePath)) {
+                    Storage::delete($relativePath);
+                }
             }
-            $image->move($imagePath, $imageName);
-
             $data['productPhotoPath'] = $imageUrl;
         }
 
@@ -168,9 +170,12 @@ class ProductController extends Controller
         }
 
         if ($product->productPhotoPath) {
-            $imagePath = public_path('img/photoProduct') . '/' . basename($product->productPhotoPath);
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
+            $path = parse_url($product->productPhotoPath, PHP_URL_PATH);
+            $fileName = basename($path);
+            $relativePath = 'public/img/photoProduct/' . $fileName;
+
+            if (Storage::exists($relativePath)) {
+                Storage::delete($relativePath);
             }
         }
 
@@ -190,9 +195,9 @@ class ProductController extends Controller
         $products = Product::whereIn('id', $ids)->get();
         foreach ($products as $product) {
             if ($product->productPhotoPath) {
-                $imagePath = public_path('img/photoProduct') . '/' . basename($product->productPhotoPath);
-                if (File::exists($imagePath)) {
-                    File::delete($imagePath);
+                $imagePath = 'public/img/photoProduct/' . basename($product->productPhotoPath);
+                if (Storage::exists($imagePath)) {
+                    Storage::delete($imagePath);
                 }
             }
         }

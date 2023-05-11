@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class GalleryController extends Controller
@@ -113,11 +114,8 @@ class GalleryController extends Controller
 
         $image = $request->file('galleryPhotoPath');
         $imageName = time() . '_' . $image->getClientOriginalName();
-        $imagePath = public_path('img/photoGallery');
-        $imageUrl = url('img/photoGallery/' . $imageName);
-
-        $image->move($imagePath, $imageName);
-
+        $galleryPhotoPath = $request->file('galleryPhotoPath')->storeAs('public/img/photoGallery/', $imageName);
+        $imageUrl = url('') . Storage::url($galleryPhotoPath);
 
         $data['galleryPhotoPath'] = $imageUrl;
         $gallery = Gallery::create($data);
@@ -152,8 +150,9 @@ class GalleryController extends Controller
         if ($request->hasFile('galleryPhotoPath')) {
             $image = $request->file('galleryPhotoPath');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('img/photoGallery');
-            $imageUrl = url('img/photoGallery/' . $imageName);
+
+            $galleryPhotoPath = $request->file('galleryPhotoPath')->storeAs('public/img/photoGallery/', $imageName);
+            $imageUrl = url('') . Storage::url($galleryPhotoPath);
 
             /**
              * $path: pisahkan http://127.0.0.1:8000 menjadi /img/photoGallery/{file}
@@ -161,13 +160,15 @@ class GalleryController extends Controller
              * $relativePath : buat link /var/www/myapp/public/img/photoGallery/{file}
              */
 
-            $path = parse_url($gallery->galleryPhotoPath, PHP_URL_PATH);
-            $relativePath = public_path($path);
+            if ($gallery->galleryPhotoPath) {
+                $path = parse_url($gallery->galleryPhotoPath, PHP_URL_PATH);
+                $fileName = basename($path);
+                $relativePath = 'public/img/photoGallery/' . $fileName;
 
-            if (file_exists($relativePath)) {
-                unlink($relativePath);
+                if (Storage::exists($relativePath)) {
+                    Storage::delete($relativePath);
+                }
             }
-            $image->move($imagePath, $imageName);
 
             $data['galleryPhotoPath'] = $imageUrl;
         }
@@ -192,9 +193,12 @@ class GalleryController extends Controller
         }
 
         if ($gallery->galleryPhotoPath) {
-            $imagePath = public_path('img/photoGallery') . '/' . basename($gallery->galleryPhotoPath);
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
+            $path = parse_url($gallery->galleryPhotoPath, PHP_URL_PATH);
+            $fileName = basename($path);
+            $relativePath = 'public/img/photoGallery/' . $fileName;
+
+            if (Storage::exists($relativePath)) {
+                Storage::delete($relativePath);
             }
         }
 
@@ -214,9 +218,10 @@ class GalleryController extends Controller
         $galleries = Gallery::whereIn('id', $ids)->get();
         foreach ($galleries as $gallery) {
             if ($gallery->galleryPhotoPath) {
-                $imagePath = public_path('img/photoGallery') . '/' . basename($gallery->galleryPhotoPath);
-                if (File::exists($imagePath)) {
-                    File::delete($imagePath);
+                $imagePath = 'public/img/photoGallery/' . basename($gallery->galleryPhotoPath);
+
+                if (Storage::exists($imagePath)) {
+                    Storage::delete($imagePath);
                 }
             }
         }
