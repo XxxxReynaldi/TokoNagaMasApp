@@ -24,7 +24,6 @@ class ProductTransactionController extends Controller
             'user_id' => 'required|int|exists:users,id',
             'bank_account_name' => 'required|regex:/^[a-zA-Z\s]*$/',
             'purchaseReceiptPath' => 'required|image|mimes:jpeg,png,jpg|max:4096',
-            'total_price' => 'required|int|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -108,15 +107,22 @@ class ProductTransactionController extends Controller
         $data['status'] = 'pending';
         $data['purchaseReceiptPath'] = url('') . Storage::url($purchaseReceiptPath);
 
-        $transaction = ProductTransaction::create($data);
-
         $detailData = $cartProducts->map(function ($cartProduct) {
+            $product = Product::find($cartProduct->product_id);
+            $product->stock -= $cartProduct->quantity;
+            $product->save();
+
             return [
                 'product_id' => $cartProduct->product_id,
                 'quantity' => $cartProduct->quantity,
                 'price' => $cartProduct->price
             ];
         })->toArray();
+
+        $total_price = $cartProducts->sum('price');
+        $data['total_price'] = $total_price;
+
+        $transaction = ProductTransaction::create($data);
 
         // hubungkan detail product transaction dengan ProductTransaction yang baru saja dibuat
         $transaction->products()->attach($detailData);
@@ -126,20 +132,6 @@ class ProductTransactionController extends Controller
         //     $cartProduct->update(['status_check' => 0]);
         // });
         return ResponseFormatter::success(['transaction' => $transaction], 'Show transaction successfully');
-
-
-
-        // foreach ($cartProducts as $cartProduct) {
-        //     $product = $cartProduct->product;
-        //     $quantity = $cartProduct->quantity;
-        //     $price = $cartProduct->price;
-
-        //     $productTransaction->products()->attach($product, ['quantity' => $quantity, 'price' => $price]);
-        // }
-
-        // return ResponseFormatter::success(['products' => $products->get()], 'Show product successfully');
-
-        // return ResponseFormatter::success(['product' => $product], 'Show product successfully');
     }
 
 

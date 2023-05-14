@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CartProductController extends Controller
@@ -120,45 +121,58 @@ class CartProductController extends Controller
     {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'cart_products.*.product_id' => 'required|integer',
-            'cart_products.*.price' => 'required|integer|min:0',
-            'cart_products.*.quantity' => 'required|integer|min:0',
-            'cart_products.*.status_check' => 'required',
+            'product_id' => 'required|array',
+            'product_id.*' => 'required|int|exists:products,id',
+            'quantity' => 'required|array',
+            'quantity.*' => 'required|integer|min:0|max:100',
+            'status_check' => 'required|array',
+            'status_check.*' => 'required|int|min:0|max:1',
         ]);
 
         if ($validator->fails()) {
             return ResponseFormatter::error(['error' => $validator->errors()], 'Update cart products failed', 400);
         }
 
-        $cartProductsData = $data['cart_products'];
-        $updatedCartProducts = [];
+        // dump($data);
 
-        foreach ($cartProductsData as $cartProductData) {
-            $user_id = $cartProductData['user_id'];
-            $product_id = $cartProductData['product_id'];
+        DB::beginTransaction();
 
-            $user = User::find($user_id);
-            if (!$user) {
-                return ResponseFormatter::error(['error' => $validator->errors()], 'Update cart products failed, User Not Found', 400);
+        try {
+            $productIds = $data['product_id'];
+            $quantities = $data['quantity'];
+
+            $products = Product::whereIn('id', $data['product_id'])->get();
+            $prices = $products->map(function ($product, $index) use ($data) {
+                $quantity = $data['quantity'][$index];
+                return $quantity * $product['price'];
+            })->toArray();
+
+            $statusChecks = $data['status_check'];
+
+            // Loop melalui data dan lakukan update pada setiap row
+            foreach ($productIds as $index => $productId) {
+                CartProduct::where('product_id', $productId)
+                    ->update([
+                        'quantity' => $quantities[$index],
+                        'price' => $prices[$index],
+                        'status_check' => $statusChecks[$index]
+                    ]);
             }
 
-            $product = Product::find($product_id);
-            if (!$product) {
-                return ResponseFormatter::error(['error' => $validator->errors()], 'Update cart products failed, Product Not Found', 400);
-            }
+            // Commit transaksi jika semua operasi berhasil
+            DB::commit();
 
-            $cartProduct = CartProduct::updateOrCreate(
-                [
-                    'user_id' => $user_id,
-                    'product_id' => $product_id
-                ],
-                $cartProductData
-            );
+            // Ambil data CartProduct setelah update
+            $cartProducts = CartProduct::whereIn('product_id', $productIds)->get();
 
-            $updatedCartProducts[] = $cartProduct;
+            return ResponseFormatter::success(['cartProducts' => $cartProducts], 'Cart products updated successfully');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollBack();
+            return ResponseFormatter::error(['error' => $e->getMessage()], 'Update cart products failed', 500);
         }
 
-        return ResponseFormatter::success(['cartProducts' => $updatedCartProducts], 'Cart products updated successfully');
+        // return ResponseFormatter::success(['cartProducts' => $cartProducts], 'Cart products updated successfully');
     }
 
     public function destroy($id)
