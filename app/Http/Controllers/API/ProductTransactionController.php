@@ -127,6 +127,9 @@ class ProductTransactionController extends Controller
         // hubungkan detail product transaction dengan ProductTransaction yang baru saja dibuat
         $transaction->products()->attach($detailData);
 
+        // hapus product dari semua cart product yang terkait
+        CartProduct::where('user_id', $user_id)->whereIn('product_id', $product_id)->where('status_check', 1)->delete();
+
         // update status_check dari semua cart product yang terkait menjadi false
         // $cartProducts->each(function ($cartProduct) {
         //     $cartProduct->update(['status_check' => 0]);
