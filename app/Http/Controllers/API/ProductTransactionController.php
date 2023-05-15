@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProductTransactionController extends Controller
 {
@@ -27,7 +28,7 @@ class ProductTransactionController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(['error' => $validator->errors()], 'Add cart product fails', 400);
+            return ResponseFormatter::error(['error' => $validator->errors()], 'Check out failed', 400);
         }
 
         $user = User::find($user_id);
@@ -165,5 +166,58 @@ class ProductTransactionController extends Controller
 
         $transaction->delete();
         return ResponseFormatter::success(['transaction' => $transaction], 'Transaction deleted successfully');
+    }
+
+    public function getProdutTransaction(Request $request)
+    {
+        $id = $request->input('id');
+        $limit = $request->input('limit', 6);
+
+        $user_id = $request->input('user_id');
+
+        if ($id) {
+            $productTransaction = ProductTransaction::with([
+                'products' => function ($query) {
+                    $query->select('product_id', 'name', 'description', 'products.price', 'productPhotoPath');
+                },
+                'user' => function ($query) {
+                    $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+                }
+            ])->find($id);
+
+            if ($productTransaction)
+                return ResponseFormatter::success($productTransaction, 'Data product transaction retrieved successfully');
+            else
+                return ResponseFormatter::error(null, 'Data product transaction not found', 404);
+        }
+
+        $productTransaction = ProductTransaction::with([
+            'products' => function ($query) {
+                $query->select('product_id', 'name', 'description', 'products.price', 'productPhotoPath');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+            }
+        ]);
+
+        if ($user_id)
+            $productTransaction->where('user_id', $user_id);
+
+        $payload = JWTAuth::parseToken()->getPayload();
+        $role_id = $payload->get('user')['role_id'];
+
+        /***
+         * Jika role_id = 2
+         * pastikan terdapat param user_id yang bersangkutan
+         */
+        if ($role_id == 2 && !$user_id) {
+            return ResponseFormatter::error(null, 'Data product transaction not found', 404);
+        }
+
+
+        return ResponseFormatter::success(
+            $productTransaction->paginate($limit),
+            'Data list product transaction retrieved successfully'
+        );
     }
 }

@@ -54,6 +54,9 @@ Route::group(['middleware' => ['checkroleapi:admin,customer']], function () {
         Route::patch('cart-product/mass-update/{user_id}', [CartProductController::class, 'massUpdate']);
         Route::post('cart-product/mass-delete/{user_id}', [CartProductController::class, 'massDestroy']);
 
+        Route::get('product-transaction', [ProductTransactionController::class, 'getProdutTransaction']);
+        Route::get('mechanic-transaction', [MechanicTransactionController::class, 'getMechanicTransaction']);
+
         // for dev
         Route::delete('product-transaction-co/{id}', [ProductTransactionController::class, 'destroy']);
         Route::delete('mechanic-transaction-co/{id}', [MechanicTransactionController::class, 'destroy']);

@@ -44,4 +44,9 @@ class ProductTransaction extends Model
     {
         return $this->belongsToMany(Product::class, 'transaction_details')->withPivot('quantity', 'price');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

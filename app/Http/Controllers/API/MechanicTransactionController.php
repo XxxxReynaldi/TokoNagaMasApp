@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MechanicTransactionController extends Controller
 {
@@ -24,11 +25,10 @@ class MechanicTransactionController extends Controller
             'mechanic_id' => 'required|int|exists:mechanics,id',
             'bank_account_name' => 'required|regex:/^[a-zA-Z\s]*$/',
             'purchaseReceiptPath' => 'required|image|mimes:jpeg,png,jpg|max:4096',
-            'total_price' => 'required|int|min:0',
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(['error' => $validator->errors()], 'Add cart product fails', 400);
+            return ResponseFormatter::error(['error' => $validator->errors()], 'Check out failed', 400);
         }
 
         $user = User::find($user_id);
@@ -51,6 +51,7 @@ class MechanicTransactionController extends Controller
 
         $purchaseReceiptPath = $request->file('purchaseReceiptPath')->storeAs('public/img/purchaseReceipt/' . $folder . '/mechanic', $imageName);
         $data['status'] = 'pending';
+        $data['total_price'] = $mechanic->get()[0]->price;
         $data['purchaseReceiptPath'] = url('') . Storage::url($purchaseReceiptPath);
 
         $transaction = MechanicTransaction::create($data);
@@ -80,5 +81,58 @@ class MechanicTransactionController extends Controller
 
         $transaction->delete();
         return ResponseFormatter::success(['transaction' => $transaction], 'Transaction deleted successfully');
+    }
+
+    public function getMechanicTransaction(Request $request)
+    {
+        $id = $request->input('id');
+        $limit = $request->input('limit', 6);
+
+        $user_id = $request->input('user_id');
+
+        if ($id) {
+            $mechanicTransaction = MechanicTransaction::with([
+                'mechanic' => function ($query) {
+                    $query->select('id', 'name', 'category', 'description', 'price', 'mechanicPhotoPath');
+                },
+                'user' => function ($query) {
+                    $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+                }
+            ])->find($id);
+
+            if ($mechanicTransaction)
+                return ResponseFormatter::success($mechanicTransaction, 'Data mechanic transaction retrieved successfully');
+            else
+                return ResponseFormatter::error(null, 'Data mechanic transaction not found', 404);
+        }
+
+        $mechanicTransaction = MechanicTransaction::with([
+            'mechanic' => function ($query) {
+                $query->select('id', 'name', 'category', 'description', 'price', 'mechanicPhotoPath');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
+            }
+        ]);
+
+        if ($user_id)
+            $mechanicTransaction->where('user_id', $user_id);
+
+        $payload = JWTAuth::parseToken()->getPayload();
+        $role_id = $payload->get('user')['role_id'];
+
+        /***
+         * Jika role_id = 2
+         * pastikan terdapat param user_id yang bersangkutan
+         */
+        if ($role_id == 2 && !$user_id) {
+            return ResponseFormatter::error(null, 'Data mechanic transaction not found', 404);
+        }
+
+
+        return ResponseFormatter::success(
+            $mechanicTransaction->paginate($limit),
+            'Data list mechanic transaction retrieved successfully'
+        );
     }
 }

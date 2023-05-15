@@ -116,6 +116,11 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
+    public function getRoleNamaAttribute()
+    {
+        return $this->role->name;
+    }
+
     // Relation
     public function mechanicTransaction()
     {
@@ -132,8 +137,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
-    public function getRoleNamaAttribute()
+    public function productTransaction()
     {
-        return $this->role->name;
+        return $this->hasMany(ProductTransaction::class);
     }
 }
