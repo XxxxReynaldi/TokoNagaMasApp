@@ -90,6 +90,9 @@ class MechanicTransactionController extends Controller
 
         $user_id = $request->input('user_id');
 
+        /**
+         * $id = transaction_id
+         */
         if ($id) {
             $mechanicTransaction = MechanicTransaction::with([
                 'mechanic' => function ($query) {
@@ -120,12 +123,18 @@ class MechanicTransactionController extends Controller
 
         $payload = JWTAuth::parseToken()->getPayload();
         $role_id = $payload->get('user')['role_id'];
+        $userIdToken = $payload->get('user')['id'];
 
         /***
-         * Jika role_id = 2
-         * pastikan terdapat param user_id yang bersangkutan
+         * Jika role_id = 2 dan
+         * pastikan terdapat param user_id 
          */
         if ($role_id == 2 && !$user_id) {
+            return ResponseFormatter::error(null, 'Data mechanic transaction not found', 404);
+        }
+
+        // jika user_id bukan yang bersangkutan
+        if ($role_id == 2 && $user_id != $userIdToken) {
             return ResponseFormatter::error(null, 'Data mechanic transaction not found', 404);
         }
 
