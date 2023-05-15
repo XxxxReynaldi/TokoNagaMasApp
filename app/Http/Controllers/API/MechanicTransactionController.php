@@ -89,6 +89,7 @@ class MechanicTransactionController extends Controller
         $limit = $request->input('limit', 6);
 
         $user_id = $request->input('user_id');
+        $status = $request->input('status');
 
         /**
          * $id = transaction_id
@@ -120,6 +121,9 @@ class MechanicTransactionController extends Controller
 
         if ($user_id)
             $mechanicTransaction->where('user_id', $user_id);
+
+        if ($status)
+            $mechanicTransaction->where('status', $status);
 
         $payload = JWTAuth::parseToken()->getPayload();
         $role_id = $payload->get('user')['role_id'];
