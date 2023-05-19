@@ -152,6 +152,7 @@ class CartProductController extends Controller
             // Loop melalui data dan lakukan update pada setiap row
             foreach ($productIds as $index => $productId) {
                 CartProduct::where('product_id', $productId)
+                    ->where('user_id', $user_id)
                     ->update([
                         'quantity' => $quantities[$index],
                         'price' => $prices[$index],
@@ -163,7 +164,7 @@ class CartProductController extends Controller
             DB::commit();
 
             // Ambil data CartProduct setelah update
-            $cartProducts = CartProduct::whereIn('product_id', $productIds)->get();
+            $cartProducts = CartProduct::where('user_id', $user_id)->whereIn('product_id', $productIds)->get();
 
             return ResponseFormatter::success(['cartProducts' => $cartProducts], 'Cart products updated successfully');
         } catch (\Exception $e) {
