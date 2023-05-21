@@ -86,7 +86,7 @@ class CartProductController extends Controller
         $validator = Validator::make($data, [
             'user_id' => 'required|int',
             'product_id' => 'required|int',
-            'quantity' => 'required|int|min:0|max:99',
+            'quantity' => 'required|int|min:1|max:99',
             // 'price' => 'required|int|min:0',
             'status_check' => 'required',
         ]);
@@ -125,7 +125,7 @@ class CartProductController extends Controller
             'product_id' => 'required|array',
             'product_id.*' => 'required|int|exists:products,id',
             'quantity' => 'required|array',
-            'quantity.*' => 'required|integer|min:0|max:100',
+            'quantity.*' => 'required|integer|min:1|max:100',
             'status_check' => 'required|array',
             'status_check.*' => 'required|int|min:0|max:1',
         ]);
