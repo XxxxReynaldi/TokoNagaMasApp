@@ -86,8 +86,8 @@ class CartProductController extends Controller
         $validator = Validator::make($data, [
             'user_id' => 'required|int',
             'product_id' => 'required|int',
-            'quantity' => 'required|int|min:0',
-            'price' => 'required|int|min:0',
+            'quantity' => 'required|int|min:0|max:99',
+            // 'price' => 'required|int|min:0',
             'status_check' => 'required',
         ]);
 
@@ -105,6 +105,8 @@ class CartProductController extends Controller
             return ResponseFormatter::error(['error' => $validator->errors()], 'Add cart product fails, Product Not Found', 400);
         }
 
+        $data['price'] = $data['quantity'] * $product->price;
+
         $cartProduct = CartProduct::updateOrCreate(
             [
                 'user_id' => $user_id,
@@ -112,7 +114,6 @@ class CartProductController extends Controller
             ],
             $data
         );
-
 
         return ResponseFormatter::success(['cartProduct' => $cartProduct], 'Cart product inserted successfully');
     }
