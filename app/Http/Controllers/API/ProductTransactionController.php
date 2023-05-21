@@ -25,6 +25,7 @@ class ProductTransactionController extends Controller
             'user_id' => 'required|int|exists:users,id',
             'bank_account_name' => 'required|regex:/^[a-zA-Z\s]*$/',
             'purchaseReceiptPath' => 'required|image|mimes:jpeg,png,jpg|max:4096',
+            'total_price' => 'required|int',
         ]);
 
         if ($validator->fails()) {
@@ -120,8 +121,8 @@ class ProductTransactionController extends Controller
             ];
         })->toArray();
 
-        $total_price = $cartProducts->sum('price');
-        $data['total_price'] = $total_price;
+        // $total_price = $cartProducts->sum('price');
+        // $data['total_price'] = $total_price;
 
         $transaction = ProductTransaction::create($data);
 
