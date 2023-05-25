@@ -49,7 +49,6 @@ class MechanicController extends Controller
 
         // Jika header authorization tidak kosong, ambil user yang login
         // $user = Auth::guard('sanctum')->user();
-
         $mechanics = Mechanic::all();
 
         return ResponseFormatter::success(['mechanics' => $mechanics], 'Mechanics retrieved successfully');

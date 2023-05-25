@@ -35,15 +35,15 @@
                         </span>
                     @enderror
                   </div>
-                  <div class="form-check form-switch d-flex align-items-center mb-3">
+                  {{-- <div class="form-check form-switch d-flex align-items-center mb-3">
                     <input class="form-check-input" type="checkbox" id="remember" {{ old('remember') ? 'checked' : '' }} >
                     <label class="form-check-label mb-0 ms-3" for="remember">Remember me</label>
                    
-                  </div>
+                  </div> --}}
                   <div class="text-center">
                     <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">Sign in</button>
                   </div>
-                  <p class="mt-4 text-sm text-center">
+                  {{-- <p class="mt-4 text-sm text-center">
                     Don't have an account?
                     <a href="{{ route('register') }}" class="text-primary text-gradient font-weight-bold">Sign up</a>
                     @if (Route::has('password.request'))
@@ -51,7 +51,7 @@
                             {{ __('Forgot Your Password?') }}
                         </a>
                     @endif
-                  </p>
+                  </p> --}}
                 </form>
               </div>
             </div>

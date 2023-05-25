@@ -15,16 +15,19 @@ class CheckRole
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!Auth::check()) {
             return redirect('/login');
         }
 
         $user = Auth::user();
+        $role = strtolower($user->role->name);
 
-        if ($user->roles != $role) {
-            abort(403, 'Unauthorized action.');
+        // Check user role
+        if (!$user || !in_array($role, $roles)) {
+            abort(403);
+            // return redirect()->back();
         }
 
         return $next($request);
