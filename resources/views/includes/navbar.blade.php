@@ -160,11 +160,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white {{ Request::is('mechanics') ? 'active bg-gradient-primary' : '' }} " href="{{ route('mechanics.index') }}">
+                    <a class="nav-link text-white {{ Request::is('user') ? 'active bg-gradient-primary' : '' }} " href="{{ route('user.users.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <span class="material-icons">home_repair_service</span>
+                            <span class="material-icons">person</span>
                         </div>
-                        <span class="nav-link-text ms-1">Mekanik</span>
+                        <span class="nav-link-text ms-1">Pengguna</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -183,7 +183,14 @@
                         <span class="nav-link-text ms-1">Galeri</span>
                     </a>
                 </li>
-
+                <li class="nav-item">
+                    <a class="nav-link text-white {{ Request::is('mechanics') ? 'active bg-gradient-primary' : '' }} " href="{{ route('mechanics.index') }}">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <span class="material-icons">home_repair_service</span>
+                        </div>
+                        <span class="nav-link-text ms-1">Mekanik</span>
+                    </a>
+                </li>
                 <li class="nav-item mt-3">
                     <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages
                     </h6>

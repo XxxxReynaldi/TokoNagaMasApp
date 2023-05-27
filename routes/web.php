@@ -23,9 +23,15 @@ Route::get('/', function () {
 
 Route::group(['middleware' => ['checkrole:admin']], function () {
 
-    Route::get('user', [UserController::class, 'showProfile']);
-    Route::patch('user/{id}/photo', [UserController::class, 'updatePhoto']);
-    Route::patch('user/{id}', [UserController::class, 'updateProfile']);
+
+    Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
+        Route::get('{id}/show', [UserController::class, 'showProfile'])->name('profile-show');;
+        Route::patch('{id}/photo', [UserController::class, 'updatePhoto'])->name('photo-update');;
+        Route::patch('{id}', [UserController::class, 'updateProfile'])->name('profile-update');
+        Route::patch('{user}/reset-password', [UserController::class, 'resetPassword'])->name('password-reset');
+        Route::delete('{user}/destroy', [UserController::class, 'destroy'])->name('destroy');
+        Route::get('users', [UserController::class, 'getUsers'])->name('users.index');
+    });
 
     Route::resource('mechanics', MechanicController::class)->except(['create', 'edit', 'show']);
     Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);

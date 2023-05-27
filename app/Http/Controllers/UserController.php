@@ -20,6 +20,53 @@ class UserController extends Controller
 
     use PasswordValidationRules;
 
+    public function index()
+    {
+        $users = User::all();
+        return view('pages.users.index', compact('users'));
+    }
+
+    public function getUsers()
+    {
+        $users = User::where('role_id', 2)->get();
+        return view('pages.users.index', compact('users'));
+    }
+
+    public function resetPassword(Request $request, User $user)
+    {
+        $data = $request->all();
+        $data['password']              = Hash::make('user-password123');
+        $data['password_confirmation'] = $data['password'];
+        Validator::make($data, [
+            'password' => $this->passwordRules(),
+        ])->validate();
+
+        $user->forceFill([
+            // 'password' => Hash::make($data['password']),
+            'password' => $data['password'],
+        ])->save();
+
+        return redirect()->route('user.users.index')
+            ->with('success', 'Reset password successfully.');
+    }
+
+    public function destroy(User $user)
+    {
+        if ($user->profilePhotoPath) {
+            $path = parse_url($user->profilePhotoPath, PHP_URL_PATH);
+            $fileName = basename($path);
+            $relativePath = 'public/img/photoProfile/' . $fileName;
+
+            if (Storage::exists($relativePath)) {
+                Storage::delete($relativePath);
+            }
+        }
+        $user->delete();
+
+        return redirect()->route('user.users.index')
+            ->with('success', 'User deleted successfully.');
+    }
+
     public function login(Request $request)
     {
         try {
