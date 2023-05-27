@@ -168,7 +168,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white {{ Request::is('products') ? 'active bg-gradient-primary' : '' }}" href="./dashboard.html">
+                    <a class="nav-link text-white {{ Request::is('products') ? 'active bg-gradient-primary' : '' }}" href="{{ route('products.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <span class="material-icons">inventory</span>
                         </div>
@@ -176,7 +176,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white {{ Request::is('galleries') ? 'active bg-gradient-primary' : '' }}" href="./dashboard.html">
+                    <a class="nav-link text-white {{ Request::is('galleries') ? 'active bg-gradient-primary' : '' }}" href="{{ route('galleries.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <span class="material-icons">collections_bookmark</span>
                         </div>

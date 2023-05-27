@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\MechanicController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,10 +27,14 @@ Route::group(['middleware' => ['checkrole:admin']], function () {
     Route::patch('user/{id}/photo', [UserController::class, 'updatePhoto']);
     Route::patch('user/{id}', [UserController::class, 'updateProfile']);
 
-    Route::resource('mechanics', MechanicController::class)->except(['create', 'edit']);
+    Route::resource('mechanics', MechanicController::class)->except(['create', 'edit', 'show']);
+    Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
+    Route::resource('galleries', GalleryController::class)->except(['create', 'edit', 'show']);
     // Route::get('mechanic/filter', [MechanicController::class, 'filter']);
     // Route::get('mechanic/{id}', [MechanicController::class, 'show']);
 
+
+    Route::post('product-api', [GalleryController::class, 'getProducts'])->name('product-api');
     // Route::get('product', [ProductController::class, 'index']);
     // Route::get('product/filter', [ProductController::class, 'filter']);
     // Route::get('product/{id}', [ProductController::class, 'show']);
@@ -51,6 +57,7 @@ Route::group(['middleware' => ['checkrole:admin']], function () {
     // for dev
     // Route::delete('product-transaction-co/{id}', [ProductTransactionController::class, 'destroy']);
     // Route::delete('mechanic-transaction-co/{id}', [MechanicTransactionController::class, 'destroy']);
+
 
 });
 

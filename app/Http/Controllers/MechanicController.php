@@ -9,43 +9,44 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\Paginator;
 use DataTables;
-
+use Illuminate\Support\Facades\Session;
 
 class MechanicController extends Controller
 {
     public function index(Request $request)
     {
-        // $mechanics = Mechanic::all();
-        // return view('mechanics.index', compact('mechanics'));
-        if (request()->ajax()) {
+        $mechanics = Mechanic::all();
+        return view('pages.mechanics.index', compact('mechanics'));
 
-            $mechanics = Mechanic::select(['id', 'name', 'category', 'price', 'description', 'status', 'mechanicPhotoPath'])->get();
-            return DataTables::of($mechanics)
-                ->addColumn('action', function ($mechanic) {
-                    return view('mechanics.action', compact('mechanic'));
-                })
-                ->addColumn('status_label', function ($mechanic) {
-                    return $mechanic->status == 1 ? 'Aktif' : 'Tidak Aktif';
-                })
-                ->toJson();
-        }
+        // if (request()->ajax()) {
 
-        return view('mechanics.index');
+        //     $mechanics = Mechanic::select(['id', 'name', 'category', 'price', 'description', 'status', 'mechanicPhotoPath'])->get();
+        //     return DataTables::of($mechanics)
+        //         ->addColumn('action', function ($mechanic) {
+        //             return view('mechanics.action', compact('mechanic'));
+        //         })
+        //         ->addColumn('status_label', function ($mechanic) {
+        //             return $mechanic->status == 1 ? 'Aktif' : 'Tidak Aktif';
+        //         })
+        //         ->toJson();
+        // }
+
+        // return view('mechanics.index');
     }
 
     public function store(Request $request)
     {
         $data = $request->all();
-        $validator = Validator::make($data, [
+        $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
-            'status' => 'required',
             'mechanicPhotoPath' => 'required|image|max:4096',
         ]);
 
         // if ($validator->fails()) {
-        //     return ResponseFormatter::error(['error' => $validator->errors()], 'Add mechanic fails', 400);
+        //     return redirect()->route('mechanics.index')->with('error', $validator->errors());
+        //     // return ResponseFormatter::error(['error' => $validator->errors()], 'Add mechanic fails', 400);
         // }
 
         if ($request->hasFile('mechanicPhotoPath')) {
@@ -55,9 +56,9 @@ class MechanicController extends Controller
             $imageUrl = url('') . Storage::url($mechanicPhotoPath);
 
             $data['mechanicPhotoPath'] = $imageUrl;
+            Mechanic::create($data);
         }
 
-        Mechanic::create($data);
 
         return redirect()->route('mechanics.index')
             ->with('success', 'Mechanic created successfully.');
@@ -66,17 +67,12 @@ class MechanicController extends Controller
     public function update(Request $request, Mechanic $mechanic)
     {
         $data = $request->all();
-        $validator = Validator::make($data, [
+        $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
-            'status' => 'required',
             'mechanicPhotoPath' => 'nullable|image|max:4096',
         ]);
-
-        // if ($validator->fails()) {
-        //     return ResponseFormatter::error(['error' => $validator->errors()], 'Add mechanic fails', 400);
-        // }
 
         if ($request->hasFile('mechanicPhotoPath')) {
             $image = $request->file('mechanicPhotoPath');
@@ -108,5 +104,28 @@ class MechanicController extends Controller
 
         return redirect()->route('mechanics.index')
             ->with('success', 'Mechanic updated successfully.');
+    }
+
+    public function destroy(Mechanic $mechanic)
+    {
+        // $mechanic = Mechanic::find($id);
+        // if (!$mechanic) {
+        //     return redirect()->route('mechanics.index')
+        //         ->with('error', 'Mechanic Not Found');
+        // }
+
+        if ($mechanic->mechanicPhotoPath) {
+            $path = parse_url($mechanic->mechanicPhotoPath, PHP_URL_PATH);
+            $fileName = basename($path);
+            $relativePath = 'public/img/photoMechanic/' . $fileName;
+
+            if (Storage::exists($relativePath)) {
+                Storage::delete($relativePath);
+            }
+        }
+
+        $mechanic->delete();
+        return redirect()->route('mechanics.index')
+            ->with('success', 'Mechanic deleted successfully.');
     }
 }
