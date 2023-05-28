@@ -25,9 +25,10 @@ Route::group(['middleware' => ['checkrole:admin']], function () {
 
 
     Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
-        Route::get('{id}/show', [UserController::class, 'showProfile'])->name('profile-show');;
-        Route::patch('{id}/photo', [UserController::class, 'updatePhoto'])->name('photo-update');;
-        Route::patch('{id}', [UserController::class, 'updateProfile'])->name('profile-update');
+        Route::get('profile-show', [UserController::class, 'showProfile'])->name('profile-show');;
+        Route::patch('{user}/photo', [UserController::class, 'updatePhoto'])->name('photo-update');;
+        Route::patch('{user}', [UserController::class, 'updateProfile'])->name('profile-update');
+        Route::patch('{user}/password', [UserController::class, 'updatePassword'])->name('password-update');
         Route::patch('{user}/reset-password', [UserController::class, 'resetPassword'])->name('password-reset');
         Route::delete('{user}/destroy', [UserController::class, 'destroy'])->name('destroy');
         Route::get('users', [UserController::class, 'getUsers'])->name('users.index');

@@ -67,6 +67,78 @@ class UserController extends Controller
             ->with('success', 'User deleted successfully.');
     }
 
+    public function showProfile(Request $request)
+    {
+        $user = Auth::user();
+        return view('pages.profile.index', compact('user'));
+    }
+
+    public function updatePhoto(Request $request, User $user)
+    {
+        $request->validate([
+            'profilePhotoPath' => 'required|image|max:4096',
+        ]);
+
+        if ($request->hasFile('profilePhotoPath')) {
+            $folder = $user->id;
+            $image = $request->file('profilePhotoPath');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+
+            $profilePhotoPath = $request->file('profilePhotoPath')->storeAs('public/img/photoProfile/' . $folder, $imageName);
+            $imageUrl = url('') . Storage::url($profilePhotoPath);
+
+
+            if ($user->profilePhotoPath) {
+                $path = parse_url($user->profilePhotoPath, PHP_URL_PATH);
+                $fileName = basename($path);
+                $relativePath = 'public/img/photoProfile/' . $folder . '/' . $fileName;
+
+                if (Storage::exists($relativePath)) {
+                    Storage::delete($relativePath);
+                }
+            }
+
+            $user->profilePhotoPath = $imageUrl;
+            $user->save();
+        }
+
+        return redirect()->route('user.profile-show')
+            ->with('success', 'Photo updated successfully.');
+    }
+
+    public function updateProfile(Request $request, User $user)
+    {
+        $data = $request->all();
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ];
+
+        $request->validate($rules);
+
+        $user->update($data);
+        return redirect()->route('user.profile-show')
+            ->with('success', 'Profile updated successfully.');
+    }
+
+    public function updatePassword(Request $request, User $user)
+    {
+        $data = $request->all();
+        Validator::make($data, [
+            'current_password' => ['required', 'string', 'current_password:web'],
+            'password' => $this->passwordRules(),
+        ], [
+            'current_password.current_password' => __('The provided password does not match your current password.'),
+        ])->validate();
+
+        $user->forceFill([
+            'password' => Hash::make($data['password']),
+        ])->save();
+
+        return redirect()->route('user.profile-show')
+            ->with('success', 'Profile updated successfully.');
+    }
+
     public function login(Request $request)
     {
         try {
@@ -161,8 +233,6 @@ class UserController extends Controller
         ], 200);
     }
 
-
-
     /**
      * Get the token array structure.
      *
@@ -216,78 +286,5 @@ class UserController extends Controller
         // return ResponseFormatter::success($token, 'Token Revoked');
         $this->guard()->logout();
         return ResponseFormatter::success('token', 'Token Revoked');
-    }
-
-    public function showProfile(Request $request)
-    {
-        return ResponseFormatter::success($request->user(), 'Show Data Profile Success');
-    }
-
-    public function updatePhoto(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'profilePhotoPath' => 'required|image|max:4096',
-        ]);
-
-        if ($validator->fails()) {
-            return ResponseFormatter::error(['error' => $validator->errors()], 'Update photo fails', 401);
-        }
-
-        $user = User::find($id);
-        if (!$user) {
-            return ResponseFormatter::error(['error' => 'User Not Found'], 'User Not Found', 404);
-        }
-
-        $folder = $user->id;
-        $image = $request->file('profilePhotoPath');
-        $imageName = time() . '_' . $image->getClientOriginalName();
-
-        $profilePhotoPath = $request->file('profilePhotoPath')->storeAs('public/img/photoProfile/' . $folder, $imageName);
-        $imageUrl = url('') . Storage::url($profilePhotoPath);
-
-
-        if ($user->profilePhotoPath) {
-            $path = parse_url($user->profilePhotoPath, PHP_URL_PATH);
-            $fileName = basename($path);
-            $relativePath = 'public/img/photoProfile/' . $folder . '/' . $fileName;
-
-            if (Storage::exists($relativePath)) {
-                Storage::delete($relativePath);
-            }
-        }
-
-        $user->profilePhotoPath = $imageUrl;
-        $user->save();
-
-        return ResponseFormatter::success(['profilePhotoPath' => $imageUrl], 'File success upload');
-    }
-
-
-    public function updateProfile(Request $request, $id)
-    {
-        try {
-            $data = $request->all();
-            $rules = [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            ];
-
-            $validatedData = $request->validate($rules);
-
-            // $user = Auth::user();
-            $user = User::find($id);
-            if (!$user) {
-                return ResponseFormatter::error(['message' => 'Unauthorized'], 'Authentication Failed', 500);
-            }
-            $user->update($data);
-
-            return ResponseFormatter::success(['user' => $user], 'User data updated successfully');
-        } catch (Exception $e) {
-            $errors = $e->errors();
-            return ResponseFormatter::error([
-                'message' => 'Validation error',
-                'errors' => $errors,
-            ], 'Validation Failed', 422);
-        }
     }
 }
