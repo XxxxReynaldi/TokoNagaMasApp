@@ -67,12 +67,17 @@ class MechanicController extends Controller
     public function update(Request $request, Mechanic $mechanic)
     {
         $data = $request->all();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
             'mechanicPhotoPath' => 'nullable|image|max:4096',
         ]);
+
+        if (!array_key_exists("status", $data)) {
+            $data['status'] = "0";
+        }
 
         if ($request->hasFile('mechanicPhotoPath')) {
             $image = $request->file('mechanicPhotoPath');

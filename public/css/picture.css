@@ -30,3 +30,39 @@
     border: 2px solid #e91e63;
     padding: 8px;
 }
+
+/* 
+    Picture receipt
+*/
+.picture-receipt-div {
+    transition: all 0.4s;
+    border-radius: 1.5rem;
+    width: 500px;
+    height: 500px;
+}
+
+.picture-receipt-div:hover {
+    transition: all 0.4s;
+    border: 4px solid #e91e63;
+    border-radius: 1.5rem;
+}
+
+.picture-receipt-div:hover img {
+    transition: all 0.4s;
+    filter: blur(40px);
+    transform: scale(80%);
+}
+
+.picture-receipt-div .blur {
+    overflow: hidden;
+    border-radius: 1.5rem;
+    /* padding: 5px;
+	border: 1px solid #ddd; */
+}
+
+.picture-receipt-img {
+    object-fit: contain;
+    border-radius: 1.5rem;
+    border: 2px solid #e91e63;
+    padding: 8px;
+}
