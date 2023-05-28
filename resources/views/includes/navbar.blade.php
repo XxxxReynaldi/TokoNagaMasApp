@@ -152,7 +152,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="./dashboard.html">
+                    <a class="nav-link text-white" href="#">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <span class="material-icons">receipt</span>
                         </div>
