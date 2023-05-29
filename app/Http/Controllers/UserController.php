@@ -121,6 +121,36 @@ class UserController extends Controller
             ->with('success', 'Profile updated successfully.');
     }
 
+    public function updateProfileAdm(Request $request, User $user)
+    {
+        $data = $request->all();
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ];
+
+        $request->validate($rules);
+
+        $user->update($data);
+        return redirect()->route('user.users.index')
+            ->with('success', 'Profile updated successfully.');
+    }
+
+    public function updatePasswordAdm(Request $request, User $user)
+    {
+        $data = $request->all();
+        Validator::make($data, [
+            'password' => $this->passwordRules(),
+        ])->validate();
+
+        $user->forceFill([
+            'password' => Hash::make($data['password']),
+        ])->save();
+
+        return redirect()->route('user.users.index')
+            ->with('success', 'Password updated successfully.');
+    }
+
     public function updatePassword(Request $request, User $user)
     {
         $data = $request->all();

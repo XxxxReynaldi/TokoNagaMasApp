@@ -31,6 +31,8 @@ Route::group(['middleware' => ['checkrole:admin']], function () {
         Route::patch('{user}/photo', [UserController::class, 'updatePhoto'])->name('photo-update');;
         Route::patch('{user}', [UserController::class, 'updateProfile'])->name('profile-update');
         Route::patch('{user}/password', [UserController::class, 'updatePassword'])->name('password-update');
+        Route::patch('{user}/profile-update-adm', [UserController::class, 'updateProfileAdm'])->name('profile-update-adm');
+        Route::patch('{user}/password-adm', [UserController::class, 'updatePasswordAdm'])->name('password-update-adm');
         Route::patch('{user}/reset-password', [UserController::class, 'resetPassword'])->name('password-reset');
         Route::delete('{user}/destroy', [UserController::class, 'destroy'])->name('destroy');
         Route::get('users', [UserController::class, 'getUsers'])->name('users.index');

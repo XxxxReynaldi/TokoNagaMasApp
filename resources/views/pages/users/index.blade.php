@@ -74,8 +74,10 @@
                           <td class="text-xs text-secondary mb-0">{{ $user->address }}</td>
                           <td class="text-xs text-secondary mb-0">{{ $user->phone_number }}</td>
                           <td>  
-                            <button data-bs-toggle="modal" data-bs-target="#resetPWUserModal-{{$user->id}}" class="btn bg-gradient-warning btn-block mb-3">Reset Password</button>
-                            <button data-bs-toggle="modal" data-bs-target="#viewUserModal-{{$user->id}}" class="btn bg-gradient-info btn-block mb-3">Lihat</button>
+                            {{-- <button data-bs-toggle="modal" data-bs-target="#resetPWUserModal-{{$user->id}}" class="btn bg-gradient-warning btn-block mb-3">Reset Password</button>
+                            <button data-bs-toggle="modal" data-bs-target="#viewUserModal-{{$user->id}}" class="btn bg-gradient-info btn-block mb-3">Lihat</button> --}}
+                            <button data-bs-toggle="modal" data-bs-target="#editPasswordUserModal-{{$user->id}}" class="btn bg-gradient-success btn-block mb-3">Edit Password</button>
+                            <button data-bs-toggle="modal" data-bs-target="#editUserModal-{{$user->id}}" class="btn bg-gradient-success btn-block mb-3">Edit</button>
                             <button data-bs-toggle="modal" data-bs-target="#deleteUserModal-{{$user->id}}" class="btn bg-gradient-danger btn-block mb-3">Hapus</button>
                           </td>
                       </tr>
@@ -95,7 +97,7 @@
 @push('modals')
 <!-- Modal -->
 @foreach ($users as $user)
-<div class="modal fade" id="viewUserModal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="viewUserModal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -103,12 +105,12 @@
         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>
+      </div> --}}
       {{-- <form action="{{ route('user.users.update', $user) }}" method="POST" enctype="multipart/form-data"> --}}
       {{-- <form action="#" method="POST" enctype="multipart/form-data"> --}}
         {{-- @csrf
         @method('PATCH') --}}
-        <div class="modal-body">
+        {{-- <div class="modal-body">
           <div class="row">
             <div class="col-6">
               <div class="d-flex justify-content-center">
@@ -151,8 +153,104 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn bg-gradient-info" data-bs-dismiss="modal">Tutup</button>
-        </div>
+        </div> --}}
       {{-- </form> --}}
+    {{-- </div>
+  </div>
+</div> --}}
+
+<div class="modal fade" id="editPasswordUserModal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="userModalLabel">Edit Password</h5>
+        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ route('user.password-update-adm', $user) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-12">
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">Nama</label>
+                <input type="text" disabled class="form-control" value="{{$user->name}}">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">Password</label>
+                <input type="text" class="form-control" name="password">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">Password Confirmation</label>
+                <input type="text" class="form-control" name="password_confirmation">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn bg-gray-200" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn bg-gradient-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editUserModal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="userModalLabel">Edit Pengguna</h5>
+        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ route('user.profile-update-adm', $user) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PATCH')
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-6">
+              <div class="d-flex justify-content-center">
+                  <div class="picture-div blur">
+                    <img src="{{ $user->profilePhotoPath }}" aria-hidden alt="picture-{{ $user->name }}" class="picture-img" width="300" height="300">
+                  </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">Nama</label>
+                <input type="text" class="form-control" name="name" value="{{ $user->name }}">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">Email</label>
+                <input type="text" class="form-control" name="email" value="{{ $user->email }}">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">Alamat</label>
+                <input type="text" class="form-control" name="address" value="{{ $user->address }}">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+              <div class="input-group input-group-outline my-3 is-filled">
+                <label class="form-label">No Telp</label>
+                <input type="text" class="form-control" name="phone_number" value="{{ $user->phone_number }}">
+                <span class="invalid-feedback" role="alert"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn bg-gray-200" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn bg-gradient-primary">Simpan</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -181,7 +279,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="resetPWUserModal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="resetPWUserModal-{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -203,7 +301,7 @@
       </form>
     </div>
   </div>
-</div>
+</div> --}}
 @endforeach
 
 @endpush
