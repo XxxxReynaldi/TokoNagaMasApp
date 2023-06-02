@@ -150,13 +150,29 @@
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link text-white {{ Request::is('product-transactions') ? 'active bg-gradient-primary' : '' }}" href="{{ route('product-transactions.index') }}">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <span class="material-icons">receipt</span>
                         </div>
                         <span class="nav-link-text ms-1">Transaksi</span>
                     </a>
+                </li> --}}
+                <li class="nav-item">
+                    <a class="nav-link text-white " data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <span class="material-icons">receipt</span>
+                        </div>
+                        <span class="nav-link-text ms-1">Transaksi</span>
+                    </a>
+                    <div class="collapse {{ Request::is('product-transactions') || Request::is('mechanic-transactions') ? 'show' : '' }}" id="collapseExample">
+                        <a class="nav-link text-white {{ Request::is('product-transactions') ? 'active bg-gradient-primary' : '' }}" href="{{ route('product-transactions.index') }}">
+                            <span class="nav-link-text ms-1">Transaksi Produk</span>
+                        </a>
+                        <a class="nav-link text-white {{ Request::is('mechanic-transactions') ? 'active bg-gradient-primary' : '' }}" href="{{ route('mechanic-transactions.index') }}">
+                            <span class="nav-link-text ms-1">Transaksi Mekanik</span>
+                        </a>
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white {{ Request::is('user') ? 'active bg-gradient-primary' : '' }} " href="{{ route('user.users.index') }}">

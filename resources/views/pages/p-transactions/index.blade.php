@@ -83,8 +83,8 @@
                           </td>
                           <td class="text-xs text-secondary mb-0 text-end">Rp {{ number_format($productTransaction->total_price, 0, ',', '.') }}</td>
                           <td>  
-                            <button data-bs-toggle="modal" data-bs-target="#editProductModal-{{$productTransaction->id}}" class="btn bg-gradient-success btn-block mb-3">Edit</button>
-                            <button data-bs-toggle="modal" data-bs-target="#deleteProductModal-{{$productTransaction->id}}" class="btn bg-gradient-danger btn-block mb-3">Hapus</button>
+                            <button data-bs-toggle="modal" data-bs-target="#editProductTransModal-{{$productTransaction->id}}" class="btn bg-gradient-success btn-block mb-3">Edit</button>
+                            {{-- <button data-bs-toggle="modal" data-bs-target="#deleteProductTransModal-{{$productTransaction->id}}" class="btn bg-gradient-danger btn-block mb-3">Hapus</button> --}}
                           </td>
                       </tr>
                   @endforeach
@@ -96,66 +96,7 @@
       </div>
     </div>
     
-    
   </div>
-
-@push('modals')
-<!-- Modal -->
-<div class="modal fade" id="createProductModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title font-weight-normal" id="productModalLabel">Tambah Transaksi Produk</h5>
-        <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form action="{{ route('product-transactions.store') }}" method="POST" id="productTransaction-form" enctype="multipart/form-data">
-        @csrf
-        <div class="modal-body">
-          <div class="input-group input-group-outline my-3">
-            <label class="form-label">Nama</label>
-            <input type="text" class="form-control" name="name" required>
-            <span class="invalid-feedback" role="alert"></span>
-          </div>
-          <div class="row">
-            <div class="col-3">
-              <div class="input-group input-group-outline my-3">
-                <label class="form-label">Stok</label>
-                <input type="number" class="form-control" name="stock" required>
-                <span class="invalid-feedback" role="alert"></span>
-              </div>
-            </div>
-            <div class="col-9">
-              <div class="input-group input-group-outline my-3">
-                <label class="form-label">Harga</label>
-                <input type="number" class="form-control" name="price" required>
-                <span class="invalid-feedback" role="alert"></span>
-              </div>
-            </div>
-          </div>
-          <div class="my-3">
-            <label class="form-label">Deskripsi</label>
-            <div class="input-group input-group-outline">
-              <textarea type="text" class="form-control" name="description" rows="3"></textarea>
-            </div>
-            <span class="invalid-feedback" role="alert"></span>
-          </div>
-          
-          <div class="form-file-upload form-file-simple my-3 ">
-            <label class="form-label">Upload Gambar</label>
-            <input type="file" class="form-control" name="productPhotoPath">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn bg-gray-100" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn bg-gradient-info">Simpan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-@endpush
 
 @push('modals')
 <!-- Modal -->
@@ -174,8 +115,8 @@
           <div class="row">
             <div class="col-12">
               <div class="d-flex justify-content-center">
-                <div class="picture-receipt-div blur">
-                  <img src="{{ $productTransaction->purchaseReceiptPath }}" aria-hidden alt="picture-{{ $productTransaction->user->name }}" class="picture-receipt-img" width="500" height="500">
+                <div class="picture-receipt-div filter">
+                  <img src="{{ $productTransaction->purchaseReceiptPath }}" aria-hidden alt="picture-{{ $productTransaction->user->name }}" class="picture-receipt-img" width="100%" height="100%">
                 </div>
               </div>
             </div>
@@ -188,11 +129,11 @@
   </div>
 </div>
 
-<div class="modal fade" id="editProductModal-{{$productTransaction->id}}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+<div class="modal fade" id="editProductTransModal-{{$productTransaction->id}}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title font-weight-normal" id="productModalLabel">Edit Transaksi Produk</h5>
+        <h5 class="modal-title font-weight-normal" id="productModalLabel">Konfirmasi Pembayaran Transaksi Produk</h5>
         <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -202,46 +143,88 @@
         @method('PATCH')
         <div class="modal-body">
           <div class="row">
-            <div class="col-6">
-              <div class="d-flex justify-content-center">
-                  <div class="picture-div blur">
-                    <img src="{{ $productTransaction->productPhotoPath }}" aria-hidden alt="picture-{{ $productTransaction->name }}" class="picture-img" width="300" height="300">
-                  </div>
-              </div>
+            <div class="col-6" style="display: flex; flex-wrap: wrap;">
+              
+                <div class="d-flex justify-content-center align-content-center">
+                    <div class="picture-receipt-div filter">
+                      <img src="{{ $productTransaction->purchaseReceiptPath }}" aria-hidden alt="picture-{{ $productTransaction->id }}" class="picture-receipt-img" width="100%" height="100%">
+                    </div>
+                </div>
+              
             </div>
             <div class="col-6">
-              <div class="input-group input-group-outline my-3 is-filled">
-                <label class="form-label">Nama</label>
-                <input type="text" class="form-control" name="name" value="{{ $productTransaction->name }}">
-                <span class="invalid-feedback" role="alert"></span>
+              <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                  <tbody>
+                    <tr>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="10%">Nama</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="5%">:</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder">{{ $productTransaction->user->name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="10%">Nama Bank</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="5%">:</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder">{{ $productTransaction->bank_name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="10%">Atas Nama</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="5%">:</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder">{{ $productTransaction->bank_account_name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="10%">No Rekening</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder" width="5%">:</td>
+                      <td class="text-uppercase text-secondary text-xxs font-weight-bolder">{{ $productTransaction->account_number }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <hr>
+                <table class="table align-items-center mb-0" class="product-table">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-xxs font-weight-bolder opacity-100">Nama Produk</th>
+                      <th class="text-uppercase text-xxs font-weight-bolder opacity-100 text-center">Jumlah</th>
+                      <th class="text-uppercase text-xxs font-weight-bolder opacity-100 text-end">Total Harga</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{-- {{dump($productTransaction->products)}} --}}
+                    @foreach ($productTransaction->products as $product)
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div>
+                            <img src="{{$product->productPhotoPath}}" class="avatar avatar-sm me-3 border-radius-lg" alt="photo-{{$product->name}}">
+                          </div>
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">{{ $product->name }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-xs text-secondary mb-0 text-center">{{ $product->pivot->quantity }}</td>
+                      <td class="text-xs text-secondary mb-0 text-end">Rp {{ number_format($product->pivot->price, 0, ',', '.') }}</td>
+                    </tr>
+                    @endforeach
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xs text-start" colspan="2">Total Harga Akhir</th>
+                      <th class="text-uppercase text-secondary text-xs text-end" >Rp {{ number_format($productTransaction->total_price, 0, ',', '.') }}</th>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div class="row">
-                <div class="col-3">
-                  <div class="input-group input-group-outline my-3 is-filled">
-                    <label class="form-label">Stok</label>
-                    <input type="number" class="form-control" name="stock" value="{{ $productTransaction->stock }}">
-                    <span class="invalid-feedback" role="alert"></span>
-                  </div>
-                </div>
-                <div class="col-9">
-                  <div class="input-group input-group-outline my-3 is-filled">
-                    <label class="form-label">Harga</label>
-                    <input type="number" class="form-control" name="price" value="{{ $productTransaction->price }}">
-                    <span class="invalid-feedback" role="alert"></span>
-                  </div>
-                </div>
-              </div>
-              <div class="my-3">
-                <label class="form-label">Deskripsi</label>
+
+              <div class="my-4">
+                <label class="form-label">Status</label>
                 <div class="input-group input-group-outline">
-                  <textarea type="text" class="form-control" name="description" rows="3">{{ $productTransaction->description }}</textarea>
+                  <select class="form-control material-selection" name="status" style="width: 100%;">
+                    <option value="pending" @if($productTransaction->status == 'pending') selected @endif>pending</option>
+                    <option value="kirim" @if($productTransaction->status == 'kirim') selected @endif>kirim</option>
+                    <option value="selesai" @if($productTransaction->status == 'selesai') selected @endif>selesai</option>
+                    <option value="batal" @if($productTransaction->status == 'batal') selected @endif>batal</option>
+                  </select>
                 </div>
-                <span class="invalid-feedback" role="alert"></span>
               </div>
-              <div class="form-file-upload form-file-simple my-3 ">
-                <label class="form-label">Upload Gambar baru</label>
-                <input type="file" class="form-control" name="productPhotoPath">
-              </div>
+              
             </div>
             
           </div>
@@ -255,7 +238,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="deleteProductModal-{{$productTransaction->id}}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="deleteProductTransModal-{{$productTransaction->id}}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -277,7 +260,7 @@
       </form>
     </div>
   </div>
-</div>
+</div> --}}
 @endforeach
 
 @endpush
@@ -289,8 +272,14 @@
     $(document).ready(function() {
 
       productTransactionsTable();
+      mechanicTransactionsTable();
       function productTransactionsTable(){
         $('#p-transactions-table').DataTable();  
+        $('.product-table').DataTable();  
+      }
+
+      function mechanicTransactionsTable(){
+        $('#m-transactions-table').DataTable();  
       }
 
     });

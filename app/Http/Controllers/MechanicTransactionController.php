@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseFormatter;
-use App\Models\Product;
-use App\Models\ProductTransaction;
+use App\Models\Mechanic;
+use App\Models\MechanicTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -12,21 +12,21 @@ use Illuminate\Pagination\Paginator;
 use DataTables;
 use Illuminate\Support\Facades\Session;
 
-class ProductTransactionController extends Controller
+class MechanicTransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $productTransactions = ProductTransaction::with([
-            'products' => function ($query) {
-                $query->select('product_id', 'name', 'description', 'products.price', 'productPhotoPath');
+        $mechanicTransactions = MechanicTransaction::with([
+            'mechanic' => function ($query) {
+                $query->select('id', 'name', 'category', 'description', 'price', 'mechanicPhotoPath');
             },
             'user' => function ($query) {
                 $query->select('id', 'name', 'email', 'phone_number', 'address', 'profilePhotoPath');
             }
         ])->get();
-        // dd($productTransactions);
+        // dd($mechanicTransactions);
 
-        return view('pages.p-transactions.index', compact('productTransactions'));
+        return view('pages.m-transactions.index', compact('mechanicTransactions'));
 
         // if (request()->ajax()) {
         //     $products = Product::select(['id', 'name', 'category', 'price', 'description', 'status', 'productPhotoPath'])->get();
@@ -43,35 +43,29 @@ class ProductTransactionController extends Controller
         // return view('products.index');
     }
 
-
-    public function update(Request $request, ProductTransaction $productTransaction)
+    public function update(Request $request, MechanicTransaction $mechanicTransaction)
     {
         $data = $request->all();
         $request->validate([
             'status' => 'required|string|max:255',
         ]);
 
-        $productTransaction->update($data);
-        // dd($productTransaction);
-        return redirect()->route('product-transactions.index')
-            ->with('success', 'Product updated successfully.');
+        $mechanicTransaction->update($data);
+
+        return redirect()->route('mechanic-transactions.index')
+            ->with('success', 'Transaction updated successfully.');
     }
 
-    public function destroy(ProductTransaction $productTransaction)
+    public function destroy(MechanicTransaction $mechanicTransaction)
     {
-        $transaction = $productTransaction;
-        // $query2 = Product::select('products.id', 'products.name', 'products.price AS product_price', 'products.stock', 'products.description', 'products.productPhotoPath', 'transaction_details.product_transaction_id AS pivot_product_transaction_id', 'transaction_details.product_id AS pivot_product_id', 'transaction_details.quantity AS pivot_quantity', 'transaction_details.price AS pivot_price')
-        //     ->join('transaction_details', 'products.id', '=', 'transaction_details.product_id')
-        //     ->whereIn('transaction_details.product_transaction_id', [$id]);
-
-        // $detailTransaction = $query2->get();
+        $transaction = $mechanicTransaction;
 
         $imagePath = $transaction->purchaseReceiptPath;
         $folder = $transaction->user_id;
         if ($imagePath) {
             $path = parse_url($transaction->purchaseReceiptPath, PHP_URL_PATH);
             $fileName = basename($path);
-            $relativePath = 'public/img/purchaseReceipt/' . $folder . '/product/' . $fileName;
+            $relativePath = 'public/img/purchaseReceipt/' . $folder . '/mechanic/' . $fileName;
 
             if (Storage::exists($relativePath)) {
                 Storage::delete($relativePath);
@@ -79,7 +73,7 @@ class ProductTransactionController extends Controller
         }
 
         $transaction->delete();
-        return redirect()->route('product-transactions.index')
-            ->with('success', 'Transaction deleted successfully');
+        return redirect()->route('mechanic-transactions.index')
+            ->with('success', 'Transaction deleted successfully.');
     }
 }

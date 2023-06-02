@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProductTransactionController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\MechanicController;
+use App\Http\Controllers\MechanicTransactionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +42,8 @@ Route::group(['middleware' => ['checkrole:admin']], function () {
     Route::resource('mechanics', MechanicController::class)->except(['create', 'edit', 'show']);
     Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
     Route::resource('galleries', GalleryController::class)->except(['create', 'edit', 'show']);
-    Route::resource('product-transactions', ProductTransactionController::class)->except(['create', 'edit', 'show']);
+    Route::resource('product-transactions', ProductTransactionController::class)->except(['create', 'edit', 'show', 'store']);
+    Route::resource('mechanic-transactions', MechanicTransactionController::class)->except(['create', 'edit', 'show', 'store']);
     // Route::get('mechanic/filter', [MechanicController::class, 'filter']);
     // Route::get('mechanic/{id}', [MechanicController::class, 'show']);
 

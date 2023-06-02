@@ -37,30 +37,53 @@
 .picture-receipt-div {
     transition: all 0.4s;
     border-radius: 1.5rem;
-    width: 500px;
-    height: 500px;
+    width: 100%;
+    height: 100%;
 }
 
 .picture-receipt-div:hover {
     transition: all 0.4s;
-    border: 4px solid #e91e63;
+    /* border: 4px solid #e91e63; */
     border-radius: 1.5rem;
 }
 
 .picture-receipt-div:hover img {
     transition: all 0.4s;
-    filter: blur(40px);
-    transform: scale(80%);
+    transform: scale(120%);
 }
 
-.picture-receipt-div .blur {
+.picture-receipt-div .filter {
+    overflow: hidden;
+    border-radius: 1.5rem;
+    /* padding: 5px; */
+    border: 1px solid #e91e63;
+}
+
+.picture-receipt-img {
+    object-fit: contain;
+    border-radius: 1.5rem;
+    border: 2px solid #e91e63;
+    padding: 8px;
+}
+
+/* 
+    Mechanic Picture
+*/
+.picture-mechanic-div {
+    transition: all 0.4s;
+    border-radius: 1.5rem;
+    width: 100%;
+    height: 100%;
+}
+
+.picture-mechanic-div .filter {
     overflow: hidden;
     border-radius: 1.5rem;
     /* padding: 5px;
 	border: 1px solid #ddd; */
 }
 
-.picture-receipt-img {
+.picture-mechanic-img {
     object-fit: contain;
     border-radius: 1.5rem;
     border: 2px solid #e91e63;
