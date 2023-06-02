@@ -218,6 +218,7 @@
                 <div class="input-group input-group-outline">
                   <select class="form-control material-selection" name="status" style="width: 100%;">
                     <option value="pending" @if($productTransaction->status == 'pending') selected @endif>pending</option>
+                    <option value="proses" @if($productTransaction->status == 'proses') selected @endif>proses</option>
                     <option value="kirim" @if($productTransaction->status == 'kirim') selected @endif>kirim</option>
                     <option value="selesai" @if($productTransaction->status == 'selesai') selected @endif>selesai</option>
                     <option value="batal" @if($productTransaction->status == 'batal') selected @endif>batal</option>
